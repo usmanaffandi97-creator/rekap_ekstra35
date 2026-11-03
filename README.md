@@ -131,18 +131,25 @@ git push -u origin main
 
 ---
 
-## 🔗 Integrasi Google Apps Script (Opsional)
+## 🔗 Cara Menghubungkan ke Google Sheets (Mengaktifkan Online Mode)
 
-Jika ingin data tersimpan otomatis di Google Sheets sekolah:
-1. Buka [Google Sheets](https://sheets.new) baru.
+Saat aplikasi pertama kali dibuka di Vercel atau browser, status aplikasi adalah **🟡 Offline / Browser Mode** (data tersimpan di memori browser lokal). Untuk mengaktifkan **🟢 Online Mode** agar semua data tersimpan langsung ke Google Spreadsheet:
+
+1. Buat atau buka [Google Sheets](https://sheets.new) milik sekolah.
 2. Buka menu **Ekstensi** > **Apps Script**.
-3. Hapus kode bawaan, lalu salin seluruh isi file [`Code.gs`](file:///f:/rekap-ekskul-appscript/Code.gs).
-4. Klik **Terapkan (Deploy)** > **Deployment Baru**.
+3. Hapus seluruh isi kode lama, lalu salin dan tempel seluruh isi file [`Code.gs`](file:///f:/rekap-ekskul-appscript/Code.gs).
+4. Klik tombol **Terapkan (Deploy)** > **Deployment Baru**.
 5. Pilih jenis **Aplikasi Web (Web App)**:
+   - **Deskripsi**: `API Rekap Ekskul v4.0`
    - **Jalankan sebagai**: *Saya (email pemilik spreadsheet)*
-   - **Siapa yang memiliki akses**: *Siapa saja (Anyone)*
-6. Salin URL Web App yang dihasilkan.
-7. Masukkan URL tersebut ke dalam aplikasi melalui menu **Pengaturan Aplikasi (Khusus Admin)**.
+   - **Siapa yang memiliki akses**: *Siapa saja (Anyone)* *(PENTING: Harus "Siapa saja" agar Vercel dapat berkomunikasi dengan spreadsheet)*
+6. Klik **Terapkan (Deploy)** dan berikan izin otorisasi Google jika diminta.
+7. Salin URL Web App yang berakhiran `/exec`.
+8. Buka website Anda di Vercel, lalu:
+   - Klik tombol **"🟡 Mode Browser / Offline ⚙️"** di halaman login (atau menu **"🔗 Koneksi Google Sheets"** di dashboard Admin).
+   - Tempelkan (*paste*) URL Web App tadi.
+   - Klik **"⚡ Tes Koneksi"** lalu klik **"💾 Simpan & Aktifkan Online"**.
+9. Status aplikasi Anda kini langsung menjadi **🟢 Online (Google Sheets)**! Semua data presensi, akun, dan siswa tersinkronisasi otomatis dengan Google Spreadsheet sekolah.
 
 ---
 

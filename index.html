@@ -438,6 +438,9 @@
         <input type="password" id="loginP" class="form-control" placeholder="Masukkan Password">
       </div>
       <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">Masuk ke Aplikasi</button>
+      <div style="margin-top:14px;text-align:center;">
+        <span id="loginEnvBadge"></span>
+      </div>
     </div>
   </div>
 
@@ -1071,8 +1074,51 @@ var DEFAULT_DB = {
   ]
 };
 
+var GAS_API_KEY = 'rekapEkskul_v4_gasApiUrl';
+
+function getGasApiUrl() {
+  try { return localStorage.getItem(GAS_API_KEY) || ''; } catch(e) { return ''; }
+}
+
+function setGasApiUrl(url) {
+  try {
+    if (url && url.trim()) {
+      localStorage.setItem(GAS_API_KEY, url.trim());
+    } else {
+      localStorage.removeItem(GAS_API_KEY);
+    }
+  } catch(e){}
+  updateEnvBadges();
+}
+
 function isGas() {
   return typeof google !== 'undefined' && google.script && google.script.run;
+}
+
+function getEnvBadgeHtml() {
+  if (isGas()) {
+    return '<span class="badge badge-info" title="Berjalan langsung di lingkungan native Google Apps Script">Google Apps Script</span>';
+  }
+  var apiUrl = getGasApiUrl();
+  if (apiUrl) {
+    return '<span class="badge badge-success" style="cursor:pointer;" onclick="showGasConfigModal()" title="Terhubung ke Google Spreadsheet via Web App API. Klik untuk kelola koneksi.">🟢 Online (Google Sheets)</span>';
+  }
+  return '<span class="badge badge-warning" style="cursor:pointer;" onclick="showGasConfigModal()" title="Penyimpanan lokal browser. Klik untuk menghubungkan ke Google Spreadsheet.">🟡 Offline / Browser Mode</span>';
+}
+
+function updateEnvBadges() {
+  var badgeEl = document.getElementById('envBadge');
+  if (badgeEl) badgeEl.innerHTML = getEnvBadgeHtml();
+  var loginBadge = document.getElementById('loginEnvBadge');
+  if (loginBadge) {
+    if (isGas()) {
+      loginBadge.innerHTML = '<span class="badge badge-info" style="font-size:11px;padding:4px 10px;">🟢 Google Apps Script (Native)</span>';
+    } else if (getGasApiUrl()) {
+      loginBadge.innerHTML = '<button type="button" class="btn btn-outline btn-sm" onclick="showGasConfigModal()" style="font-size:11px;padding:4px 10px;border-radius:20px;border-color:var(--success);color:var(--success);font-weight:600;" title="Terhubung ke Google Spreadsheet via API. Klik untuk pengaturan.">🟢 Online (Google Sheets) ⚙️</button>';
+    } else {
+      loginBadge.innerHTML = '<button type="button" class="btn btn-outline btn-sm" onclick="showGasConfigModal()" style="font-size:11px;padding:4px 10px;border-radius:20px;border-color:var(--gray-300);color:var(--gray-600);" title="Penyimpanan lokal browser. Klik untuk menghubungkan ke Google Spreadsheet.">🟡 Mode Browser / Offline ⚙️</button>';
+    }
+  }
 }
 
 function loadLocalDB() {
@@ -1526,7 +1572,49 @@ function localHandler(fn, args) {
   return { success: false, message: 'Fungsi tidak dikenali: ' + fn };
 }
 
-// BRIDGE SERVER / LOCAL
+// BRIDGE SERVER / LOCAL / VERCEL HYBRID
+function callRemoteGasApi(apiUrl, fn, args, cb, eb) {
+  var payload = JSON.stringify({ action: fn, args: args || [] });
+  fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: payload,
+    redirect: 'follow'
+  })
+  .then(function(res) {
+    return res.json();
+  })
+  .then(function(json) {
+    if (json && json.success) {
+      if (cb) cb(json.data);
+    } else {
+      throw new Error((json && json.error) || 'Gagal mengeksekusi server Google Apps Script.');
+    }
+  })
+  .catch(function(err) {
+    console.warn('POST API gagal, mencoba fallback GET:', err);
+    var getUrl = apiUrl + (apiUrl.indexOf('?') >= 0 ? '&' : '?') +
+      'action=' + encodeURIComponent(fn) +
+      '&args=' + encodeURIComponent(JSON.stringify(args || [])) +
+      '&_t=' + Date.now();
+    fetch(getUrl, { method: 'GET', redirect: 'follow' })
+      .then(function(res) { return res.json(); })
+      .then(function(json) {
+        if (json && json.success) {
+          if (cb) cb(json.data);
+        } else {
+          throw new Error((json && json.error) || 'Gagal mengeksekusi server Google Apps Script.');
+        }
+      })
+      .catch(function(finalErr) {
+        console.error('Koneksi Google Apps Script API gagal:', finalErr);
+        var msg = '⚠️ Gagal terhubung ke Google Apps Script: ' + (finalErr.message || finalErr);
+        showToast(msg, 'danger');
+        if (eb) eb(finalErr);
+      });
+  });
+}
+
 function callApi(fn, args, cb, eb) {
   if (isGas()) {
     var runner = google.script.run
@@ -1538,16 +1626,21 @@ function callApi(fn, args, cb, eb) {
       });
     runner[fn].apply(runner, args || []);
   } else {
-    setTimeout(function(){
-      try {
-        var res = localHandler(fn, args || []);
-        if (cb) cb(res);
-      } catch(err) {
-        console.error('LocalHandler Error:', err);
-        if (eb) eb(err);
-        else showToast('⚠️ Kesalahan lokal: ' + err.message, 'danger');
-      }
-    }, 40);
+    var apiUrl = getGasApiUrl();
+    if (apiUrl && apiUrl.trim() !== '') {
+      callRemoteGasApi(apiUrl.trim(), fn, args || [], cb, eb);
+    } else {
+      setTimeout(function(){
+        try {
+          var res = localHandler(fn, args || []);
+          if (cb) cb(res);
+        } catch(err) {
+          console.error('LocalHandler Error:', err);
+          if (eb) eb(err);
+          else showToast('⚠️ Kesalahan lokal: ' + err.message, 'danger');
+        }
+      }, 40);
+    }
   }
 }
 
@@ -1640,9 +1733,7 @@ function setupSidebarAndNav() {
   document.getElementById('sbRole').textContent = displayRole;
 
   // Environment badge
-  document.getElementById('envBadge').innerHTML = isGas() ?
-    '<span class="badge badge-info">Google Apps Script</span>' :
-    '<span class="badge badge-warning">Offline / Browser Mode</span>';
+  document.getElementById('envBadge').innerHTML = getEnvBadgeHtml();
 
   // Desktop Sidebar Nav
   var nav = '';
@@ -1657,6 +1748,7 @@ function setupSidebarAndNav() {
       '<div class="nav-item" onclick="goTo(\'keikutsertaan\')"><span class="nav-icon">👥</span>Peserta & Pendaftaran</div>' +
       '<div class="nav-item" onclick="goTo(\'manajemen-user\')"><span class="nav-icon">🔐</span>Kelola Akun Pengguna</div>' +
       '<div class="nav-item" onclick="showLogoConfigModal()"><span class="nav-icon">🎨</span>Ganti Logo & Identitas</div>' +
+      '<div class="nav-item" onclick="showGasConfigModal()"><span class="nav-icon">🔗</span>Koneksi Google Sheets</div>' +
       '<div class="nav-sec-title">Absensi</div>' +
       '<div class="nav-item" onclick="goTo(\'input-absensi\')"><span class="nav-icon">📝</span>Input Ketidakhadiran</div>' +
       '<div class="nav-item" onclick="goTo(\'laporan-admin\')"><span class="nav-icon">📈</span>Rekap & Unduh</div>';
@@ -1784,6 +1876,155 @@ function showVersionInfoModal() {
     '</div>' +
     '</div>';
   showModal('Informasi Versi Aplikasi', html, '<button class="btn btn-primary" onclick="closeModal()">Mengerti</button>');
+}
+
+// ============================================================
+// MODAL KONEKSI GOOGLE APPS SCRIPT (ONLINE MODE)
+// ============================================================
+function showGasConfigModal() {
+  var currentUrl = getGasApiUrl();
+  var isNative = isGas();
+  var statusBadge = '';
+
+  if (isNative) {
+    statusBadge = '<span class="badge badge-info" style="font-size:12px;padding:5px 12px;">🟢 Berjalan di Native Google Apps Script</span>' +
+      '<p style="margin-top:8px;font-size:12px;color:var(--gray-600);">' +
+      'Aplikasi ini sedang berjalan langsung di lingkungan Google Apps Script. Data otomatis terhubung dan tersimpan di Google Spreadsheet Anda tanpa konfigurasi URL tambahan.</p>';
+  } else if (currentUrl) {
+    statusBadge = '<span class="badge badge-success" style="font-size:12px;padding:5px 12px;">🟢 Mode Online (Terhubung ke Google Sheets)</span>' +
+      '<p style="margin-top:8px;font-size:12px;color:var(--success);">' +
+      'Aplikasi di Vercel terhubung ke URL Google Apps Script Web App. Data presensi, siswa, dan akun disinkronkan secara realtime ke Google Spreadsheet.</p>';
+  } else {
+    statusBadge = '<span class="badge badge-warning" style="font-size:12px;padding:5px 12px;">🟡 Mode Offline / Browser Mode</span>' +
+      '<p style="margin-top:8px;font-size:12px;color:var(--gray-600);">' +
+      'Aplikasi saat ini menyimpan data secara lokal di browser Anda (localStorage). Masukkan URL Web App Google Apps Script di bawah ini agar aplikasi beralih ke <b>Mode Online</b> dan tersambung langsung ke Google Spreadsheet sekolah Anda.</p>';
+  }
+
+  var body = '' +
+    '<div style="font-size:13px;line-height:1.5;">' +
+      '<div style="padding:12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);margin-bottom:16px;">' +
+        '<div style="font-weight:600;margin-bottom:6px;color:var(--gray-800);">Status Koneksi Saat Ini:</div>' +
+        statusBadge +
+      '</div>' +
+
+      (isNative ? '' : (
+        '<div class="form-group">' +
+          '<label class="form-label" style="font-weight:600;">URL Web App Google Apps Script</label>' +
+          '<input type="url" id="inputGasUrl" class="form-control" style="font-family:monospace;font-size:12px;" ' +
+            'placeholder="https://script.google.com/macros/s/AKfycb.../exec" value="' + (currentUrl ? escapeHtml(currentUrl) : '') + '">' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:4px;">' +
+            'Pastikan berakhiran <code>/exec</code> (bukan <code>/edit</code> atau <code>/dev</code>).' +
+          '</div>' +
+        '</div>' +
+
+        '<div id="gasTestResult" style="display:none;margin-bottom:12px;padding:10px;border-radius:var(--radius-sm);font-size:12px;line-height:1.4;"></div>' +
+
+        '<div style="background:#eff6ff;border:1px solid #bfdbfe;padding:12px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:16px;color:#1e40af;">' +
+          '<b>💡 3 Langkah Singkat Mendapatkan URL Web App:</b>' +
+          '<ol style="margin:6px 0 0 16px;padding:0;">' +
+            '<li>Buka Google Spreadsheet &gt; menu <b>Ekstensi</b> &gt; <b>Apps Script</b>.</li>' +
+            '<li>Salin/perbarui kode <code>Code.gs</code> terbaru, lalu klik <b>Terapkan (Deploy)</b> &gt; <b>Deployment baru</b>.</li>' +
+            '<li>Pilih jenis <b>Aplikasi Web (Web App)</b>, atur <i>Akses: Siapa Saja (Anyone)</i>, lalu klik <b>Deploy</b> dan salin URL-nya ke sini!</li>' +
+          '</ol>' +
+        '</div>'
+      )) +
+    '</div>';
+
+  var footer = '';
+  if (isNative) {
+    footer = '<button class="btn btn-outline" onclick="closeModal()">Tutup</button>';
+  } else {
+    footer = '' +
+      '<button class="btn btn-outline" onclick="closeModal()">Batal</button>' +
+      (currentUrl ? '<button class="btn btn-danger btn-sm" onclick="disconnectGasConnection()" style="margin-right:auto;">Putuskan (Mode Offline)</button>' : '') +
+      '<button class="btn btn-outline btn-sm" onclick="testGasConnection()">⚡ Tes Koneksi</button>' +
+      '<button class="btn btn-primary" onclick="saveGasConnection()">💾 Simpan & Aktifkan Online</button>';
+  }
+
+  showModal('🔗 Koneksi Google Apps Script (Online Mode)', body, footer);
+}
+
+function testGasConnection() {
+  var inp = document.getElementById('inputGasUrl');
+  var resDiv = document.getElementById('gasTestResult');
+  if (!inp || !resDiv) return;
+  var url = inp.value.trim();
+  if (!url) {
+    resDiv.style.display = 'block';
+    resDiv.style.background = '#fef2f2';
+    resDiv.style.color = '#991b1b';
+    resDiv.style.border = '1px solid #fecaca';
+    resDiv.innerHTML = '⚠️ Masukkan URL Web App Google Apps Script terlebih dahulu.';
+    return;
+  }
+  if (url.indexOf('https://script.google.com/macros/s/') !== 0) {
+    resDiv.style.display = 'block';
+    resDiv.style.background = '#fef2f2';
+    resDiv.style.color = '#991b1b';
+    resDiv.style.border = '1px solid #fecaca';
+    resDiv.innerHTML = '⚠️ Format URL tidak valid. URL harus diawali dengan <code>https://script.google.com/macros/s/.../exec</code>.';
+    return;
+  }
+
+  resDiv.style.display = 'block';
+  resDiv.style.background = '#eff6ff';
+  resDiv.style.color = '#1e40af';
+  resDiv.style.border = '1px solid #bfdbfe';
+  resDiv.innerHTML = '⏳ Menghubungi Google Apps Script...';
+
+  callRemoteGasApi(url, 'ping', [], function(res){
+    resDiv.style.background = '#f0fdf4';
+    resDiv.style.color = '#166534';
+    resDiv.style.border = '1px solid #bbf7d0';
+    resDiv.innerHTML = '✅ <b>Koneksi Berhasil!</b> Google Spreadsheet siap digunakan: <b>' + escapeHtml((res && res.spreadsheetName) || 'Database Sekolah') + '</b>';
+  }, function(err){
+    resDiv.style.background = '#fef2f2';
+    resDiv.style.color = '#991b1b';
+    resDiv.style.border = '1px solid #fecaca';
+    resDiv.innerHTML = '❌ <b>Gagal Terhubung:</b> ' + escapeHtml(err.message || String(err)) + '<br><small>Pastikan Deployment Google Apps Script sudah diatur dengan hak akses: <i>"Siapa Saja (Anyone)"</i>.</small>';
+  });
+}
+
+function saveGasConnection() {
+  var inp = document.getElementById('inputGasUrl');
+  if (!inp) return;
+  var url = inp.value.trim();
+  if (!url) {
+    showToast('⚠️ Masukkan URL Web App terlebih dahulu!', 'danger');
+    return;
+  }
+  setGasApiUrl(url);
+  showToast('⏳ Menyinkronkan data dengan Google Spreadsheet...', 'info');
+  callApi('getAllData', [], function(data){
+    if (data) {
+      if (data.appConfig) saveLogoConfig(data.appConfig, true);
+      if (data.users && Array.isArray(data.users)) DB.users = data.users;
+      if (data.kelas && Array.isArray(data.kelas)) DB.kelas = data.kelas;
+      if (data.ekskul && Array.isArray(data.ekskul)) DB.ekskul = data.ekskul;
+      if (data.siswa && Array.isArray(data.siswa)) DB.siswa = data.siswa;
+      if (data.keikutsertaan && Array.isArray(data.keikutsertaan)) DB.keikutsertaan = data.keikutsertaan;
+      if (data.absensi && Array.isArray(data.absensi)) DB.absensi = data.absensi;
+      saveLocalDB();
+    }
+    closeModal();
+    updateEnvBadges();
+    showToast('🟢 Berhasil beralih ke Mode Online (Google Sheets)!', 'success');
+    if (CU) goTo(currentPage || 'dashboard-' + CU.role);
+  }, function(err){
+    closeModal();
+    updateEnvBadges();
+    showToast('⚠️ URL tersimpan, namun sinkronisasi gagal: ' + (err.message || err), 'danger');
+  });
+}
+
+function disconnectGasConnection() {
+  if (confirm('Putuskan koneksi Google Sheets dan kembali ke Mode Offline (Penyimpanan Browser)?')) {
+    setGasApiUrl('');
+    closeModal();
+    updateEnvBadges();
+    showToast('🟡 Mode beralih ke Offline / Browser Storage.', 'info');
+    if (CU) goTo(currentPage || 'dashboard-' + CU.role);
+  }
 }
 
 // ============================================================
@@ -3349,6 +3590,7 @@ function renderDashboardAdmin() {
           '<button class="btn btn-success" onclick="goTo(\'keikutsertaan\')">👥 Kelola Peserta & Pendaftaran</button>' +
           '<button class="btn btn-outline" onclick="goTo(\'manajemen-user\')">🔐 Kelola Akun Pengguna</button>' +
           '<button class="btn btn-outline" onclick="showLogoConfigModal()">🎨 Ganti Logo & Identitas</button>' +
+          '<button class="btn btn-outline" onclick="showGasConfigModal()">🔗 Koneksi Google Sheets</button>' +
           '<button class="btn btn-outline" onclick="goTo(\'laporan-kelas\')">📈 Lihat Rekap Wali Kelas</button>' +
           '<button class="btn btn-outline" onclick="goTo(\'siswa\')">👨‍🎓 Master Data Siswa</button>' +
           '<button class="btn btn-outline" onclick="goTo(\'ekskul\')">⚽ Master Cabang Ekskul</button>' +
@@ -3803,7 +4045,8 @@ function renderLaporanAdmin() { renderLaporanKelas(); }
 window.addEventListener('DOMContentLoaded', function() {
   loadLocalDB();
   renderAllLogos();
-  if (isGas()) {
+  updateEnvBadges();
+  if (isGas() || getGasApiUrl()) {
     callApi('getAppConfigServer', [], function(cfg){
       if (cfg) saveLogoConfig(cfg, true);
     });

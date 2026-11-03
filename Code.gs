@@ -11,7 +11,7 @@
  * Jika Apps Script dibuat dari Google Sheets (Ekstensi -> Apps Script),
  * variabel SPREADSHEET_ID tidak perlu diubah karena sistem otomatis mendeteksi sheet aktif Anda.
  */
-var SPREADSHEET_ID = '';
+var SPREADSHEET_ID = '1d7Gm08DhSTx1pphGaz265XcjkQk2-_rASojkIRWsIJ0';
 
 var SHEET = {
   USERS:         'Users',
@@ -25,9 +25,19 @@ var SHEET = {
 var SHEET_CONFIG = '_Config';
 
 // ============================================================
-// WEB APP & SPREADSHEET ENTRY POINTS
+// WEB APP & SPREADSHEET ENTRY POINTS (HYBRID: NATIVE & EXTERNAL REST API)
 // ============================================================
 function doGet(e) {
+  // 1. Dukungan API eksternal via GET (Vercel / curl / test ping)
+  if (e && e.parameter && e.parameter.action) {
+    var getArgs = [];
+    if (e.parameter.args) {
+      try { getArgs = JSON.parse(e.parameter.args); } catch(err) { getArgs = []; }
+    }
+    return handleApiRequest(e.parameter.action, getArgs);
+  }
+
+  // 2. Tampilan Native Web App jika dibuka langsung dari script.google.com
   try {
     initSheetsIfMissing();
   } catch(err) {
@@ -38,6 +48,88 @@ function doGet(e) {
     .setTitle('Rekap Presensi Ekskul v4.0 — Multi-User Dedicated')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+}
+
+function doPost(e) {
+  try {
+    var raw = (e && e.postData && e.postData.contents) ? e.postData.contents : '{}';
+    var payload = {};
+    try { payload = JSON.parse(raw); } catch(pErr) { payload = {}; }
+    var action = payload.action || (e && e.parameter && e.parameter.action);
+    var args = payload.args || [];
+    return handleApiRequest(action, args);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.message || String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function handleApiRequest(action, args) {
+  try {
+    initSheetsIfMissing();
+    args = args || [];
+
+    if (action === 'ping') {
+      var ss = getSpreadsheet();
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        data: {
+          status: 'ok',
+          message: 'Koneksi ke Google Apps Script Berhasil!',
+          version: '4.0',
+          spreadsheetName: ss ? ss.getName() : 'Google Sheets',
+          timestamp: new Date().toISOString()
+        }
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var handlers = {
+      login: login,
+      getAppConfigServer: getAppConfigServer,
+      saveAppConfigServer: saveAppConfigServer,
+      resetAppConfigServer: resetAppConfigServer,
+      getAllData: getAllData,
+      getUsers: getUsers,
+      addUser: addUser,
+      updateUser: updateUser,
+      removeUser: removeUser,
+      changeUserPassword: changeUserPassword,
+      getSiswa: getSiswa,
+      addSiswa: addSiswa,
+      updateSiswa: updateSiswa,
+      removeSiswa: removeSiswa,
+      importSiswa: importSiswa,
+      getEkskul: getEkskul,
+      addEkskul: addEkskul,
+      updateEkskul: updateEkskul,
+      removeEkskul: removeEkskul,
+      toggleBukaEkskul: toggleBukaEkskul,
+      setAllBukaEkskul: setAllBukaEkskul,
+      getKeikutsertaan: getKeikutsertaan,
+      daftarEkskul: daftarEkskul,
+      batalEkskul: batalEkskul,
+      adminAddPeserta: adminAddPeserta,
+      adminRemovePeserta: adminRemovePeserta,
+      getSessionAbsensi: getSessionAbsensi,
+      saveAbsensi: saveAbsensi,
+      getLaporanKelas: getLaporanKelas,
+      getRekapPresensiSiswa: getRekapPresensiSiswa,
+      exportCsvKelas: exportCsvKelas,
+      exportCsvEkskul: exportCsvEkskul
+    };
+
+    if (typeof handlers[action] === 'function') {
+      var result = handlers[action].apply(null, args);
+      return ContentService.createTextOutput(JSON.stringify({ success: true, data: result }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } else {
+      return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'Aksi API tidak ditemukan: ' + action }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.message || String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 function onOpen() {
