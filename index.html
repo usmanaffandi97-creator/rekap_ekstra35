@@ -1,0 +1,3837 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rekap Presensi Ekskul — Versi 4.0 (Multi-User Dedicated)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #3730A3;
+      --primary-light: #EEF2FF;
+      --primary-subtle: #C7D2FE;
+      --success: #10B981;
+      --success-light: #ECFDF5;
+      --success-subtle: #A7F3D0;
+      --warning: #F59E0B;
+      --warning-light: #FFFBEB;
+      --warning-subtle: #FDE68A;
+      --danger: #EF4444;
+      --danger-light: #FEF2F2;
+      --danger-subtle: #FECACA;
+      --info: #06B6D4;
+      --info-light: #ECFEFF;
+      --gray-50: #F8FAFC;
+      --gray-100: #F1F5F9;
+      --gray-200: #E2E8F0;
+      --gray-300: #CBD5E1;
+      --gray-400: #94A3B8;
+      --gray-500: #64748B;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1E293B;
+      --gray-900: #0F172A;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* TYPOGRAPHY & UTILS */
+    a { color: var(--primary); text-decoration: none; }
+    h1, h2, h3, h4, h5 { font-weight: 700; color: var(--gray-900); }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .text-muted { color: var(--gray-500); }
+    .fw-bold { font-weight: 700; }
+    .fw-semibold { font-weight: 600; }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-success { background: var(--success-light); color: #065F46; }
+    .badge-warning { background: var(--warning-light); color: #92400E; }
+    .badge-danger { background: var(--danger-light); color: #991B1B; }
+    .badge-info { background: var(--info-light); color: #0E7490; }
+    .badge-gray { background: var(--gray-100); color: var(--gray-700); }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all .15s ease;
+      min-height: 38px;
+      text-decoration: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-warning:hover { background: #D97706; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #DC2626; }
+    .btn-outline { background: #fff; border-color: var(--gray-300); color: var(--gray-700); }
+    .btn-outline:hover { background: var(--gray-100); border-color: var(--gray-400); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; min-height: 32px; border-radius: 6px; }
+    .btn-lg { padding: 12px 20px; font-size: 15px; min-height: 46px; border-radius: var(--radius); }
+    .btn-full { width: 100%; }
+
+    /* FORMS & INPUTS */
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--gray-900);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    select.form-control { cursor: pointer; }
+
+    /* CARDS */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .card-title { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+
+    /* LAYOUT: LOGIN */
+    #loginPage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+    }
+    .login-box {
+      background: #fff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-brand { text-align: center; margin-bottom: 22px; }
+    .login-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    /* DEMO ACCOUNTS PILLS */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .demo-btn {
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-700);
+      cursor: pointer;
+      text-align: left;
+      transition: all .15s;
+    }
+    .demo-btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-subtle); }
+
+    /* APP LAYOUT */
+    #appLayout { display: none; min-height: 100vh; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background: var(--gray-900);
+      color: #fff;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transition: transform .25s ease;
+    }
+    .sb-brand {
+      padding: 18px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-user {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    .nav-sec-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray-400);
+      padding: 8px 10px 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--gray-300);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all .15s;
+    }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .nav-item.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+
+    .main-wrap { margin-left: 250px; min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .topbar .menu-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--gray-700); }
+    .content-area { padding: 20px; flex: 1; }
+
+    /* MOBILE BOTTOM NAVIGATION BAR */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #fff;
+      border-top: 1px solid var(--gray-200);
+      z-index: 90;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      align-items: center;
+    }
+    .mb-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      height: 100%;
+      padding-top: 2px;
+      transition: color .15s;
+    }
+    .mb-item.active { color: var(--primary); }
+    .mb-icon { font-size: 18px; margin-bottom: 2px; }
+
+    /* STICKY SAVE BAR FOR ATTENDANCE */
+    .sticky-save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 250px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 2px solid var(--primary-subtle);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 80;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      transition: left .25s;
+    }
+    #loginPage:not([style*="display: none"]) ~ #appStickyBar,
+    #loginPage[style*="display: flex"] ~ #appStickyBar {
+      display: none !important;
+    }
+
+    /* ATTENDANCE RADIO BUTTONS (TOUCH 44PX) */
+    .status-group { display: flex; gap: 4px; flex-wrap: nowrap; }
+    .status-btn {
+      flex: 1;
+      min-width: 44px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-300);
+      background: #fff;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .status-btn:hover { background: var(--gray-100); }
+    .status-btn.selected-hadir { background: var(--success); border-color: var(--success); color: #fff; }
+    .status-btn.selected-sakit { background: var(--warning); border-color: var(--warning); color: #fff; }
+    .status-btn.selected-izin  { background: var(--info); border-color: var(--info); color: #fff; }
+    .status-btn.selected-alpha { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+    /* TABLES & RESPONSIVENESS */
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); }
+    table { width: 100%; border-collapse: collapse; text-align: left; background: #fff; font-size: 13px; }
+    th { background: var(--gray-100); padding: 10px 12px; font-weight: 600; color: var(--gray-700); border-bottom: 1px solid var(--gray-200); }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
+      z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal {
+      background: #fff; width: 100%; max-width: 520px; border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .modal-header { padding: 14px 18px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+    .modal-body { padding: 18px; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 12px 18px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; top: 16px; right: 16px; z-index: 300;
+      padding: 12px 18px; border-radius: var(--radius); background: var(--gray-900);
+      color: #fff; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg);
+      transform: translateY(-20px); opacity: 0; transition: all .25s ease; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* RESPONSIVE MEDIA QUERIES */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrap { margin-left: 0; padding-bottom: 70px; }
+      .topbar .menu-btn { display: block; }
+      .mobile-bottom-nav { display: grid; }
+      .sticky-save-bar { left: 0; bottom: 60px; padding: 10px 14px; }
+      .demo-grid { grid-template-columns: 1fr; }
+      .content-area { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOAST NOTIFIKASI -->
+  <div id="toast" class="toast"></div>
+
+  <!-- HALAMAN LOGIN -->
+  <div id="loginPage">
+    <div class="login-box">
+      <div class="login-brand">
+        <!-- LOGO PEMKOT DAN SEKOLAH (DAPAT DIGANTI URL) -->
+        <div class="login-logos" style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:14px;">
+          <!-- Logo Pemkot Slot -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div id="logoPemkotSlot" style="height:60px;display:flex;align-items:center;justify-content:center;"></div>
+            <div id="brandNamaPemkotLabel" style="font-size:9px;font-weight:700;color:var(--gray-600);margin-top:4px;letter-spacing:0.5px;text-transform:uppercase;">PEMERINTAH KOTA</div>
+          </div>
+
+          <!-- Garis Pembatas -->
+          <div style="height:48px;width:1px;background:var(--gray-300);"></div>
+
+          <!-- Logo Sekolah Slot -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div id="logoSekolahSlot" style="height:60px;display:flex;align-items:center;justify-content:center;"></div>
+            <div id="brandNamaSekolahLabel" style="font-size:9px;font-weight:700;color:var(--gray-600);margin-top:4px;letter-spacing:0.5px;text-transform:uppercase;">SEKOLAH</div>
+          </div>
+        </div>
+
+        <div id="brandNamaDinas" style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">
+          DINAS PENDIDIKAN KOTA
+        </div>
+        <h2 id="brandJudulApp" style="font-size:19px;color:var(--gray-900);">Rekap Absensi Ekskul</h2>
+        <p id="brandSubJudul" class="text-muted" style="font-size:12px;margin-top:3px;">Sistem Presensi & Pendaftaran Ekstrakurikuler</p>
+      </div>
+
+      <div id="loginErr" style="display:none;padding:10px;background:var(--danger-light);color:var(--danger);border-radius:var(--radius-sm);font-size:12px;margin-bottom:12px;"></div>
+
+      <div class="form-group">
+        <label class="form-label">Username atau NIS Siswa</label>
+        <input type="text" id="loginU" class="form-control" placeholder="Masukkan Username atau NIS">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="loginP" class="form-control" placeholder="Masukkan Password">
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">Masuk ke Aplikasi</button>
+    </div>
+  </div>
+
+  <!-- APLIKASI UTAMA -->
+  <div id="appLayout">
+    <!-- SIDEBAR DESKTOP -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-brand">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div id="sbLogoPemkotSlot" style="height:25px;display:flex;align-items:center;"></div>
+          <div id="sbLogoSekolahSlot" style="height:25px;display:flex;align-items:center;"></div>
+        </div>
+        <div>
+          <div id="sbBrandJudulApp" style="font-weight:700;font-size:14px;line-height:1.2;">Rekap Ekskul</div>
+          <div id="sbBrandSubJudul" style="font-size:10px;color:var(--primary-subtle);text-transform:uppercase;letter-spacing:0.5px;">Pemkot & Sekolah</div>
+        </div>
+      </div>
+
+      <div class="sb-user">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;" id="sbAv">U</div>
+        <div style="overflow:hidden;flex:1;">
+          <div style="font-weight:600;font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;" id="sbName">-</div>
+          <div style="font-size:11px;color:var(--gray-400);" id="sbRole">-</div>
+        </div>
+      </div>
+
+      <div class="sb-nav" id="sbNav"></div>
+
+      <div style="padding:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <button class="btn btn-outline btn-full btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2);margin-bottom:8px;" onclick="showVersionInfoModal()">ℹ️ Info Versi & Switch</button>
+        <button class="btn btn-danger btn-full btn-sm" onclick="doLogout()">🚪 Keluar</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div style="flex:1;">
+          <h2 id="pageTitle" style="font-size:16px;">Dashboard</h2>
+          <div id="pageSub" style="font-size:11px;color:var(--gray-500);"></div>
+        </div>
+        <a id="btnKembaliPortalEkskul" href="#" style="display:none;align-items:center;gap:6px;padding:6px 12px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">
+          ← Ke Portal
+        </a>
+        <div id="envBadge"></div>
+      </header>
+
+      <main class="content-area" id="contentArea">
+        <!-- Render dinamis halaman di sini -->
+      </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav"></nav>
+  </div>
+
+  <!-- MODAL CONTAINER -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h4 id="modalTitle">Modal</h4>
+        <button style="background:none;border:none;font-size:18px;cursor:pointer;" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// 🎨 TEMPAT MENGGANTI LOGO & IDENTITAS INSTANSI (BISA MENGGUNAKAN URL)
+// ============================================================
+// Anda dapat memasukkan URL gambar langsung (https://... / link Google Drive / base64 / .png / .jpg / .svg / .webp)
+// Jika dikosongkan (''), sistem otomatis menampilkan lambang vektor resmi bawaan.
+var APP_CONFIG = {
+  logoPemkotUrl: '',      // Contoh: 'https://domain-anda.com/logo-pemkot.png'
+  logoSekolahUrl: '',     // Contoh: 'https://domain-anda.com/logo-sekolah.png'
+  namaPemkot: 'PEMERINTAH KOTA',
+  namaDinas: 'DINAS PENDIDIKAN KOTA',
+  judulAplikasi: 'Rekap Absensi Ekskul',
+  subJudulAplikasi: 'Sistem Presensi & Pendaftaran Ekstrakurikuler'
+};
+
+function getAppConfig() {
+  try {
+    var saved = localStorage.getItem('rekapEkskul_custom_config');
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      return Object.assign({}, APP_CONFIG, parsed);
+    }
+  } catch(e) {}
+  return Object.assign({}, APP_CONFIG);
+}
+
+function saveLogoConfig(newCfg, skipServer) {
+  try {
+    localStorage.setItem('rekapEkskul_custom_config', JSON.stringify(newCfg));
+  } catch(e) {
+    console.warn('Gagal menyimpan config ke localStorage:', e);
+  }
+  renderAllLogos();
+  if (!skipServer) {
+    callApi('saveAppConfigServer', [newCfg], function(res) {
+      if (res && res.success) {
+        console.log('Pengaturan logo tersimpan ke server.');
+      }
+    });
+  }
+}
+
+function resetLogoConfig() {
+  if (!CU || CU.role !== 'admin') {
+    showToast('⚠️ Akses ditolak! Hanya Administrator yang dapat mereset logo.', 'danger');
+    return;
+  }
+  try {
+    localStorage.removeItem('rekapEkskul_custom_config');
+  } catch(e) {}
+  callApi('resetAppConfigServer', [], function(){});
+  renderAllLogos();
+  closeModal();
+  showToast('Logo & identitas dikembalikan ke pengaturan bawaan.', 'info');
+}
+
+// State khusus untuk modal logo
+var modalLogoState = {
+  logoPemkot: '',
+  logoSekolah: '',
+  fileNamePemkot: '',
+  fileNameSekolah: ''
+};
+
+function showLogoConfigModal() {
+  if (!CU || CU.role !== 'admin') {
+    showToast('⚠️ Akses ditolak! Perubahan logo dan identitas hanya dapat dilakukan oleh Administrator.', 'danger');
+    return;
+  }
+  var cfg = getAppConfig();
+  modalLogoState = {
+    logoPemkot: cfg.logoPemkotUrl || '',
+    logoSekolah: cfg.logoSekolahUrl || '',
+    fileNamePemkot: (cfg.logoPemkotUrl && cfg.logoPemkotUrl.indexOf('data:image') === 0) ? 'Gambar kustom tersimpan' : '',
+    fileNameSekolah: (cfg.logoSekolahUrl && cfg.logoSekolahUrl.indexOf('data:image') === 0) ? 'Gambar kustom tersimpan' : ''
+  };
+
+  var body = '' +
+    '<div style="font-size:12px;margin-bottom:14px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:10px;border-radius:var(--radius-sm);line-height:1.4;">' +
+      '✨ <b>Fitur Baru:</b> Anda dapat langsung <b>mengunggah file gambar (PNG, JPG, SVG, WebP)</b> langsung dari laptop atau HP tanpa perlu membuat link URL!' +
+    '</div>' +
+
+    // KOTAK 1: LOGO PEMKOT / DAERAH
+    '<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<label style="font-size:13px;font-weight:700;margin:0;color:var(--gray-800);">🏛️ Logo Pemkot / Lambang Daerah</label>' +
+        '<span id="badgePemkot" style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--gray-200);color:var(--gray-700);">Bawaan</span>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">' +
+        '<input type="file" id="fileUploadPemkot" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="handleLogoFileUpload(event, \'pemkot\')">' +
+        '<button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById(\'fileUploadPemkot\').click()">' +
+          '📁 Upload Gambar dari Laptop/HP' +
+        '</button>' +
+        '<button type="button" id="btnHapusPemkot" class="btn btn-outline btn-sm" style="display:none;color:var(--danger);border-color:#fca5a5;" onclick="clearLogoCustom(\'pemkot\')">' +
+          '🗑️ Hapus Gambar' +
+        '</button>' +
+      '</div>' +
+
+      '<div id="fileInfoPemkot" style="font-size:11px;color:var(--success);font-weight:600;margin-bottom:6px;display:none;"></div>' +
+
+      '<details style="margin-top:6px;font-size:11px;">' +
+        '<summary style="cursor:pointer;color:var(--primary);font-weight:600;">🔗 Atau gunakan tautan URL online (opsional)</summary>' +
+        '<div style="margin-top:6px;">' +
+          '<input type="text" id="cfgLogoPemkot" class="form-control" placeholder="https://contoh.com/logo-pemkot.png" oninput="handleLogoUrlInput(\'pemkot\')">' +
+          '<span class="text-muted" style="font-size:10px;">Mendukung link gambar online HTTPS atau Google Drive.</span>' +
+        '</div>' +
+      '</details>' +
+
+      '<div style="margin-top:10px;padding:8px 10px;background:#fff;border:1px dashed var(--gray-300);border-radius:4px;display:flex;align-items:center;gap:12px;">' +
+        '<span style="font-size:11px;color:var(--gray-500);font-weight:600;">Pratinjau:</span>' +
+        '<div id="prevPemkot" style="min-height:48px;display:flex;align-items:center;"></div>' +
+      '</div>' +
+    '</div>' +
+
+    // KOTAK 2: LOGO SEKOLAH / LEMBAGA
+    '<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<label style="font-size:13px;font-weight:700;margin:0;color:var(--gray-800);">🏫 Logo Sekolah / Lembaga</label>' +
+        '<span id="badgeSekolah" style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--gray-200);color:var(--gray-700);">Bawaan</span>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">' +
+        '<input type="file" id="fileUploadSekolah" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="handleLogoFileUpload(event, \'sekolah\')">' +
+        '<button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById(\'fileUploadSekolah\').click()">' +
+          '📁 Upload Gambar dari Laptop/HP' +
+        '</button>' +
+        '<button type="button" id="btnHapusSekolah" class="btn btn-outline btn-sm" style="display:none;color:var(--danger);border-color:#fca5a5;" onclick="clearLogoCustom(\'sekolah\')">' +
+          '🗑️ Hapus Gambar' +
+        '</button>' +
+      '</div>' +
+
+      '<div id="fileInfoSekolah" style="font-size:11px;color:var(--success);font-weight:600;margin-bottom:6px;display:none;"></div>' +
+
+      '<details style="margin-top:6px;font-size:11px;">' +
+        '<summary style="cursor:pointer;color:var(--primary);font-weight:600;">🔗 Atau gunakan tautan URL online (opsional)</summary>' +
+        '<div style="margin-top:6px;">' +
+          '<input type="text" id="cfgLogoSekolah" class="form-control" placeholder="https://contoh.com/logo-sekolah.png" oninput="handleLogoUrlInput(\'sekolah\')">' +
+          '<span class="text-muted" style="font-size:10px;">Mendukung link gambar online HTTPS atau Google Drive.</span>' +
+        '</div>' +
+      '</details>' +
+
+      '<div style="margin-top:10px;padding:8px 10px;background:#fff;border:1px dashed var(--gray-300);border-radius:4px;display:flex;align-items:center;gap:12px;">' +
+        '<span style="font-size:11px;color:var(--gray-500);font-weight:600;">Pratinjau:</span>' +
+        '<div id="prevSekolah" style="min-height:48px;display:flex;align-items:center;"></div>' +
+      '</div>' +
+    '</div>' +
+
+    // FORM TEKS IDENTITAS
+    '<div class="form-group">' +
+      '<label class="form-label">Nama Daerah / Pemkot</label>' +
+      '<input type="text" id="cfgNamaPemkot" class="form-control" value="' + escapeHtml(cfg.namaPemkot || 'PEMERINTAH KOTA') + '">' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Nama Instansi / Dinas Pendidikan</label>' +
+      '<input type="text" id="cfgNamaDinas" class="form-control" value="' + escapeHtml(cfg.namaDinas || 'DINAS PENDIDIKAN KOTA') + '">' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Judul Aplikasi</label>' +
+      '<input type="text" id="cfgJudulApp" class="form-control" value="' + escapeHtml(cfg.judulAplikasi || 'Rekap Absensi Ekskul') + '">' +
+    '</div>' +
+    '<div class="form-group" style="margin-bottom:0;">' +
+      '<label class="form-label">Subjudul Aplikasi</label>' +
+      '<input type="text" id="cfgSubJudul" class="form-control" value="' + escapeHtml(cfg.subJudulAplikasi || 'Sistem Presensi & Pendaftaran Ekstrakurikuler') + '">' +
+    '</div>';
+
+  var footer = '' +
+    '<button class="btn btn-outline btn-sm" onclick="resetLogoConfig()">🔄 Reset Bawaan</button>' +
+    '<button class="btn btn-primary btn-sm" onclick="saveLogoConfigFromModal()">💾 Simpan Logo & Teks</button>';
+
+  showModal('🎨 Pengaturan Logo & Identitas (Admin)', body, footer);
+  updateLogoModalUI('pemkot');
+  updateLogoModalUI('sekolah');
+}
+
+function updateLogoModalUI(target) {
+  var isP = (target === 'pemkot');
+  var val = isP ? modalLogoState.logoPemkot : modalLogoState.logoSekolah;
+  var fileName = isP ? modalLogoState.fileNamePemkot : modalLogoState.fileNameSekolah;
+  var prevEl = document.getElementById(isP ? 'prevPemkot' : 'prevSekolah');
+  var badgeEl = document.getElementById(isP ? 'badgePemkot' : 'badgeSekolah');
+  var btnHapus = document.getElementById(isP ? 'btnHapusPemkot' : 'btnHapusSekolah');
+  var infoEl = document.getElementById(isP ? 'fileInfoPemkot' : 'fileInfoSekolah');
+  var urlInput = document.getElementById(isP ? 'cfgLogoPemkot' : 'cfgLogoSekolah');
+
+  if (!prevEl) return;
+
+  if (val && val.trim() !== '') {
+    if (badgeEl) {
+      badgeEl.textContent = 'Kustom';
+      badgeEl.style.background = '#dcfce7';
+      badgeEl.style.color = '#15803d';
+    }
+    if (btnHapus) btnHapus.style.display = 'inline-block';
+
+    if (val.indexOf('data:image') === 0) {
+      if (infoEl) {
+        infoEl.textContent = '✅ ' + (fileName || 'File gambar tersimpan di sistem');
+        infoEl.style.display = 'block';
+      }
+      if (urlInput) urlInput.value = '';
+    } else {
+      if (infoEl) infoEl.style.display = 'none';
+      if (urlInput && urlInput.value !== val) urlInput.value = val;
+    }
+
+    prevEl.innerHTML = '<img src="' + escapeHtml(val) + '" alt="Preview ' + target + '" style="height:48px;max-width:60px;object-fit:contain;border:1px solid var(--gray-300);padding:2px;border-radius:4px;background:#fff;" onerror="this.onerror=null;this.parentElement.innerHTML=\'<span style=\\\'color:var(--danger);font-size:11px;\\\'>⚠️ Gagal memuat gambar</span>\';">';
+  } else {
+    if (badgeEl) {
+      badgeEl.textContent = 'Bawaan';
+      badgeEl.style.background = 'var(--gray-200)';
+      badgeEl.style.color = 'var(--gray-700)';
+    }
+    if (btnHapus) btnHapus.style.display = 'none';
+    if (infoEl) infoEl.style.display = 'none';
+    if (urlInput) urlInput.value = '';
+
+    var defaultSvg = isP ? getDefaultLogoPemkotSvg(36, 42) : getDefaultLogoSekolahSvg(36, 42);
+    prevEl.innerHTML = '<div style="display:flex;align-items:center;gap:6px;">' + defaultSvg + '<span class="text-muted" style="font-size:11px;">(Lambang Resmi Bawaan)</span></div>';
+  }
+}
+
+function clearLogoCustom(target) {
+  if (target === 'pemkot') {
+    modalLogoState.logoPemkot = '';
+    modalLogoState.fileNamePemkot = '';
+  } else {
+    modalLogoState.logoSekolah = '';
+    modalLogoState.fileNameSekolah = '';
+  }
+  updateLogoModalUI(target);
+  showToast('Logo ' + (target === 'pemkot' ? 'Pemkot' : 'Sekolah') + ' dikembalikan ke lambang bawaan.', 'info');
+}
+
+function handleLogoUrlInput(target) {
+  var isP = (target === 'pemkot');
+  var inputEl = document.getElementById(isP ? 'cfgLogoPemkot' : 'cfgLogoSekolah');
+  var val = (inputEl.value || '').trim();
+
+  // Konversi link Google Drive jika ada
+  if (val.indexOf('drive.google.com') !== -1) {
+    var match = val.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || val.match(/id=([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      val = 'https://drive.google.com/uc?export=view&id=' + match[1];
+    }
+  }
+
+  if (isP) {
+    modalLogoState.logoPemkot = val;
+    modalLogoState.fileNamePemkot = '';
+  } else {
+    modalLogoState.logoSekolah = val;
+    modalLogoState.fileNameSekolah = '';
+  }
+  updateLogoModalUI(target);
+}
+
+function handleLogoFileUpload(event, target) {
+  var file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.match('image.*')) {
+    alert('Harap pilih berkas gambar yang valid (PNG, JPG, JPEG, SVG, atau WebP)!');
+    return;
+  }
+
+  var isP = (target === 'pemkot');
+
+  // Jika SVG, simpan langsung
+  if (file.type === 'image/svg+xml') {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      if (isP) {
+        modalLogoState.logoPemkot = e.target.result;
+        modalLogoState.fileNamePemkot = file.name;
+      } else {
+        modalLogoState.logoSekolah = e.target.result;
+        modalLogoState.fileNameSekolah = file.name;
+      }
+      updateLogoModalUI(target);
+      showToast('Gambar SVG berhasil dimuat!', 'success');
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  // Jika bitmap, optimalkan resolusi via HTML5 Canvas (max 260px)
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var maxDim = 260; // Tajam & sangat hemat memori (hanya ~15-25 KB)
+      var w = img.width;
+      var h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round(h * (maxDim / w));
+          w = maxDim;
+        } else {
+          w = Math.round(w * (maxDim / h));
+          h = maxDim;
+        }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      var isPng = (file.type === 'image/png');
+      var dataUrl = canvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', 0.88);
+
+      if (isP) {
+        modalLogoState.logoPemkot = dataUrl;
+        modalLogoState.fileNamePemkot = file.name;
+      } else {
+        modalLogoState.logoSekolah = dataUrl;
+        modalLogoState.fileNameSekolah = file.name;
+      }
+      updateLogoModalUI(target);
+      showToast('Gambar ' + file.name + ' berhasil diunggah & dioptimalkan!', 'success');
+    };
+    img.onerror = function() {
+      if (isP) {
+        modalLogoState.logoPemkot = e.target.result;
+        modalLogoState.fileNamePemkot = file.name;
+      } else {
+        modalLogoState.logoSekolah = e.target.result;
+        modalLogoState.fileNameSekolah = file.name;
+      }
+      updateLogoModalUI(target);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveLogoConfigFromModal() {
+  if (!CU || CU.role !== 'admin') {
+    showToast('⚠️ Akses ditolak! Hanya Administrator yang dapat menyimpan perubahan logo.', 'danger');
+    return;
+  }
+  var pemkot = (document.getElementById('cfgNamaPemkot').value || '').trim();
+  var dinas = (document.getElementById('cfgNamaDinas').value || '').trim();
+  var judul = (document.getElementById('cfgJudulApp').value || '').trim();
+  var sub = (document.getElementById('cfgSubJudul').value || '').trim();
+
+  var updated = {
+    logoPemkotUrl: modalLogoState.logoPemkot || '',
+    logoSekolahUrl: modalLogoState.logoSekolah || '',
+    namaPemkot: pemkot || 'PEMERINTAH KOTA',
+    namaDinas: dinas || 'DINAS PENDIDIKAN KOTA',
+    judulAplikasi: judul || 'Rekap Absensi Ekskul',
+    subJudulAplikasi: sub || 'Sistem Presensi & Pendaftaran Ekstrakurikuler'
+  };
+
+  saveLogoConfig(updated);
+  closeModal();
+  showToast('Logo dan identitas berhasil diperbarui!', 'success');
+}
+
+function getDefaultLogoPemkotSvg(w, h) {
+  w = w || 52; h = h || 60;
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M50 3L92 20V58C92 85 50 112 50 112C50 112 8 85 8 58V20L50 3Z" fill="#1E3A8A" stroke="#F59E0B" stroke-width="4"/>' +
+    '<path d="M50 10L85 24V56C85 78 50 102 50 102C50 102 15 78 15 56V24L50 10Z" fill="#2563EB"/>' +
+    '<polygon points="50,22 53.5,33 65,33 55.7,40 59.2,51 50,44.5 40.8,51 44.3,40 35,33 46.5,33" fill="#FBBF24"/>' +
+    '<path d="M30 65C30 76 38 84 50 84C62 84 70 76 70 65" stroke="#FDE047" stroke-width="3" stroke-linecap="round" fill="none"/>' +
+    '<circle cx="32" cy="55" r="3" fill="#FDE047"/>' +
+    '<circle cx="28" cy="63" r="3" fill="#FDE047"/>' +
+    '<circle cx="33" cy="72" r="3" fill="#FDE047"/>' +
+    '<circle cx="68" cy="55" r="3" fill="#FDE047"/>' +
+    '<circle cx="72" cy="63" r="3" fill="#FDE047"/>' +
+    '<circle cx="67" cy="72" r="3" fill="#FDE047"/>' +
+    '<path d="M24 88H76L70 96H30L24 88Z" fill="#DC2626" stroke="#F59E0B" stroke-width="1.5"/>' +
+    '<text x="50" y="94.5" font-family=\"sans-serif\" font-size=\"7\" font-weight=\"bold\" fill=\"#FFFFFF\" text-anchor=\"middle\">PEMKOT</text>' +
+  '</svg>';
+}
+
+function getDefaultLogoSekolahSvg(w, h) {
+  w = w || 52; h = h || 60;
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<polygon points="50,4 96,38 78,98 22,98 4,38" fill="#0284C7" stroke="#F59E0B" stroke-width="3.5"/>' +
+    '<polygon points="50,11 89,41 74,92 26,92 11,41" fill="#0369A1"/>' +
+    '<path d="M50 32C42 42 22 46 22 58C22 68 34 76 50 78C66 76 78 68 78 58C78 46 58 42 50 32Z" fill="#F59E0B"/>' +
+    '<path d="M44 76V86H56V76H44Z" fill="#D97706"/>' +
+    '<path d="M50 36C47 42 44 45 44 49C44 52 46.5 55 50 55C53.5 55 56 52 56 49C56 45 53 42 50 36Z" fill="#EF4444"/>' +
+    '<path d="M50 40C48.5 43 47 45 47 48C47 50 48.5 51.5 50 51.5C51.5 51.5 53 50 53 48C53 45 51.5 43 50 40Z" fill="#FDE047"/>' +
+    '<path d="M36 68C42 66 48 68 50 71C52 68 58 66 64 68V76C58 74 52 76 50 78C48 76 42 74 36 76V68Z" fill="#FFFFFF"/>' +
+  '</svg>';
+}
+
+function getDefaultMiniLogoPemkotSvg() {
+  return '<svg width="22" height="25" viewBox="0 0 100 115" fill="none">' +
+    '<path d="M50 3L92 20V58C92 85 50 112 50 112C50 112 8 85 8 58V20L50 3Z" fill="#1E3A8A" stroke="#F59E0B" stroke-width="4"/>' +
+    '<polygon points="50,22 53.5,33 65,33 55.7,40 59.2,51 50,44.5 40.8,51 44.3,40 35,33 46.5,33" fill="#FBBF24"/>' +
+  '</svg>';
+}
+
+function getDefaultMiniLogoSekolahSvg() {
+  return '<svg width="22" height="25" viewBox="0 0 100 115" fill="none">' +
+    '<polygon points="50,4 96,38 78,98 22,98 4,38" fill="#0284C7" stroke="#F59E0B" stroke-width="3.5"/>' +
+    '<path d="M50 32C42 42 22 46 22 58C22 68 34 76 50 78C66 76 78 68 78 58C78 46 58 42 50 32Z" fill="#F59E0B"/>' +
+  '</svg>';
+}
+
+function renderAllLogos() {
+  var cfg = getAppConfig();
+
+  // 1. Logo Pemkot di Login Box
+  var elP = document.getElementById('logoPemkotSlot');
+  if (elP) {
+    if (cfg.logoPemkotUrl && cfg.logoPemkotUrl.trim() !== '') {
+      elP.innerHTML = '<img src="' + escapeHtml(cfg.logoPemkotUrl) + '" alt="Logo Pemkot" style="height:56px;max-width:65px;object-fit:contain;" onerror="this.onerror=null;this.parentElement.innerHTML=getDefaultLogoPemkotSvg(52, 60);">';
+    } else {
+      elP.innerHTML = getDefaultLogoPemkotSvg(52, 60);
+    }
+  }
+
+  // 2. Logo Sekolah di Login Box
+  var elS = document.getElementById('logoSekolahSlot');
+  if (elS) {
+    if (cfg.logoSekolahUrl && cfg.logoSekolahUrl.trim() !== '') {
+      elS.innerHTML = '<img src="' + escapeHtml(cfg.logoSekolahUrl) + '" alt="Logo Sekolah" style="height:56px;max-width:65px;object-fit:contain;" onerror="this.onerror=null;this.parentElement.innerHTML=getDefaultLogoSekolahSvg(52, 60);">';
+    } else {
+      elS.innerHTML = getDefaultLogoSekolahSvg(52, 60);
+    }
+  }
+
+  // 3. Label & Teks Identitas
+  var lblP = document.getElementById('brandNamaPemkotLabel');
+  if (lblP) lblP.textContent = cfg.namaPemkot || 'PEMERINTAH KOTA';
+
+  var txtDinas = document.getElementById('brandNamaDinas');
+  if (txtDinas) txtDinas.textContent = cfg.namaDinas || 'DINAS PENDIDIKAN KOTA';
+  var txtJudul = document.getElementById('brandJudulApp');
+  if (txtJudul) txtJudul.textContent = cfg.judulAplikasi || 'Rekap Absensi Ekskul';
+  var txtSub = document.getElementById('brandSubJudul');
+  if (txtSub) txtSub.textContent = cfg.subJudulAplikasi || 'Sistem Presensi & Pendaftaran Ekstrakurikuler';
+
+  // 4. Mini Logo di Sidebar
+  var sbP = document.getElementById('sbLogoPemkotSlot');
+  if (sbP) {
+    if (cfg.logoPemkotUrl && cfg.logoPemkotUrl.trim() !== '') {
+      sbP.innerHTML = '<img src="' + escapeHtml(cfg.logoPemkotUrl) + '" style="height:24px;max-width:28px;object-fit:contain;" onerror="this.onerror=null;this.parentElement.innerHTML=getDefaultMiniLogoPemkotSvg();">';
+    } else {
+      sbP.innerHTML = getDefaultMiniLogoPemkotSvg();
+    }
+  }
+  var sbS = document.getElementById('sbLogoSekolahSlot');
+  if (sbS) {
+    if (cfg.logoSekolahUrl && cfg.logoSekolahUrl.trim() !== '') {
+      sbS.innerHTML = '<img src="' + escapeHtml(cfg.logoSekolahUrl) + '" style="height:24px;max-width:28px;object-fit:contain;" onerror="this.onerror=null;this.parentElement.innerHTML=getDefaultMiniLogoSekolahSvg();">';
+    } else {
+      sbS.innerHTML = getDefaultMiniLogoSekolahSvg();
+    }
+  }
+  var sbJudul = document.getElementById('sbBrandJudulApp');
+  if (sbJudul) sbJudul.textContent = cfg.judulAplikasi || 'Rekap Ekskul';
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ============================================================
+// STATE & ISOLASI STORAGE VERSI 4.0
+// ============================================================
+var SK = 'rekapEkskul_v4_multi'; // Kunci terisolasi khusus Versi 4 Multi-User
+var CU = null;                  // Current User
+var DB = null;                  // Cache database lokal
+
+// Data Default Versi 4.0 (Akun Khusus Setiap Pelatih & Wali Kelas)
+var DEFAULT_DB = {
+  users: [
+    // 1. Administrator
+    { id: 'u1', username: 'admin', password: 'admin123', name: 'Administrator', role: 'admin', ekskulId: '', kelasId: '', siswaId: '' },
+
+    // 2. Akun Mandiri Setiap Pelatih Ekskul (Password: 123)
+    { id: 'u_pel_1', username: 'pelatih_pramuka', password: '123', name: 'Kak Budi Santoso',        role: 'pelatih', ekskulId: 'e1', kelasId: '', siswaId: '' },
+    { id: 'u_pel_2', username: 'pelatih_futsal',  password: '123', name: 'Coach Doni Hermawan',      role: 'pelatih', ekskulId: 'e2', kelasId: '', siswaId: '' },
+    { id: 'u_pel_3', username: 'pelatih_basket',  password: '123', name: 'Coach Michael Wijaya',     role: 'pelatih', ekskulId: 'e3', kelasId: '', siswaId: '' },
+    { id: 'u_pel_4', username: 'pelatih_padus',   password: '123', name: 'Ibu Ratna Sari, S.Sn.',    role: 'pelatih', ekskulId: 'e4', kelasId: '', siswaId: '' },
+    { id: 'u_pel_5', username: 'pelatih_pmr',     password: '123', name: 'dr. Hendra Pratama',       role: 'pelatih', ekskulId: 'e5', kelasId: '', siswaId: '' },
+    { id: 'u_pel_all',username: 'pelatih',        password: '123', name: 'Koordinator Pelatih',      role: 'pelatih', ekskulId: '',   kelasId: '', siswaId: '' },
+
+    // 3. Akun Mandiri Setiap Wali Kelas (Password: 123)
+    { id: 'u_wali_7a', username: 'wali_7a',   password: '123', name: 'Ibu Siti Rahayu, S.Pd.',       role: 'walikelas', ekskulId: '', kelasId: 'k1', siswaId: '' },
+    { id: 'u_wali_7b', username: 'wali_7b',   password: '123', name: 'Bapak Ahmad Dahlan, M.Pd.',    role: 'walikelas', ekskulId: '', kelasId: 'k2', siswaId: '' },
+    { id: 'u_wali_8a', username: 'wali_8a',   password: '123', name: 'Ibu Nurul Hidayah, S.Pd.',     role: 'walikelas', ekskulId: '', kelasId: 'k3', siswaId: '' },
+    { id: 'u_wali_8b', username: 'wali_8b',   password: '123', name: 'Bapak Bambang Sutrisno, S.Pd.', role: 'walikelas', ekskulId: '', kelasId: 'k4', siswaId: '' },
+    { id: 'u_wali_9a', username: 'wali_9a',   password: '123', name: 'Ibu Sri Wahyuni, M.Pd.',       role: 'walikelas', ekskulId: '', kelasId: 'k5', siswaId: '' },
+    { id: 'u_wali_9b', username: 'wali_9b',   password: '123', name: 'Bapak Agus Prasetyo, S.Pd.',   role: 'walikelas', ekskulId: '', kelasId: 'k6', siswaId: '' },
+    { id: 'u_wali_all',username: 'walikelas', password: '123', name: 'Koordinator Wali Kelas',       role: 'walikelas', ekskulId: '', kelasId: '',   siswaId: '' },
+
+    // 4. Contoh Akun Siswa (Bisa login via NIS)
+    { id: 'u_s1', username: '2024001', password: '123', name: 'Ahmad Fauzi',    role: 'siswa', ekskulId: '', kelasId: 'k1', siswaId: 's1' },
+    { id: 'u_s2', username: '2024002', password: '123', name: 'Bella Agustina', role: 'siswa', ekskulId: '', kelasId: 'k1', siswaId: 's2' }
+  ],
+  kelas: [
+    { id: 'k1', name: 'Kelas 7A', tingkat: '7' },
+    { id: 'k2', name: 'Kelas 7B', tingkat: '7' },
+    { id: 'k3', name: 'Kelas 8A', tingkat: '8' },
+    { id: 'k4', name: 'Kelas 8B', tingkat: '8' },
+    { id: 'k5', name: 'Kelas 9A', tingkat: '9' },
+    { id: 'k6', name: 'Kelas 9B', tingkat: '9' }
+  ],
+  ekskul: [
+    { id: 'e1', name: 'Pramuka',      hari: 'Jumat', jam: '15:00 - 17:00', isBuka: 'BUKA', kuota: 50, deskripsi: 'Kepramukaan, pembentukan karakter, dan kepemimpinan.' },
+    { id: 'e2', name: 'Futsal',       hari: 'Sabtu', jam: '08:00 - 10:00', isBuka: 'BUKA', kuota: 30, deskripsi: 'Latihan teknik, fisik, dan turnamen futsal.' },
+    { id: 'e3', name: 'Basket',       hari: 'Selasa',jam: '15:30 - 17:00', isBuka: 'BUKA', kuota: 30, deskripsi: 'Keterampilan dribble, tembakan, dan kerja sama tim basket.' },
+    { id: 'e4', name: 'Paduan Suara', hari: 'Kamis', jam: '14:00 - 15:30', isBuka: 'BUKA', kuota: 40, deskripsi: 'Olah vokal, harmonisasi lagu, dan pertunjukan seni musik.' },
+    { id: 'e5', name: 'PMR',          hari: 'Rabu',  jam: '15:00 - 16:30', isBuka: 'BUKA', kuota: 35, deskripsi: 'Pertolongan pertama, donor darah, dan bakti sosial kesehatan.' }
+  ],
+  siswa: [
+    { id: 's1',  nama: 'Ahmad Fauzi',   kelasId: 'k1', nis: '2024001' },
+    { id: 's2',  nama: 'Bella Agustina', kelasId: 'k1', nis: '2024002' },
+    { id: 's3',  nama: 'Citra Dewi',    kelasId: 'k2', nis: '2024003' },
+    { id: 's4',  nama: 'Doni Setiawan', kelasId: 'k2', nis: '2024004' },
+    { id: 's5',  nama: 'Rizky Pratama', kelasId: 'k3', nis: '2024005' },
+    { id: 's6',  nama: 'Siti Rahma',    kelasId: 'k3', nis: '2024006' },
+    { id: 's7',  nama: 'Kevin Sanjaya', kelasId: 'k4', nis: '2024007' },
+    { id: 's8',  nama: 'Larasati',      kelasId: 'k4', nis: '2024008' },
+    { id: 's9',  nama: 'Wahyu Hidayat', kelasId: 'k5', nis: '2024009' },
+    { id: 's10', nama: 'Zahra Amalia',  kelasId: 'k5', nis: '2024010' },
+    { id: 's11', nama: 'Budi Santoso',  kelasId: 'k6', nis: '2024011' },
+    { id: 's12', nama: 'Putri Indah',   kelasId: 'k6', nis: '2024012' }
+  ],
+  keikutsertaan: [
+    { id: 'reg1',  siswaId: 's1',  ekskulId: 'e1', tanggalDaftar: '2026-09-01' },
+    { id: 'reg2',  siswaId: 's1',  ekskulId: 'e2', tanggalDaftar: '2026-09-01' },
+    { id: 'reg3',  siswaId: 's2',  ekskulId: 'e5', tanggalDaftar: '2026-09-01' },
+    { id: 'reg4',  siswaId: 's2',  ekskulId: 'e4', tanggalDaftar: '2026-09-02' },
+    { id: 'reg5',  siswaId: 's3',  ekskulId: 'e3', tanggalDaftar: '2026-09-01' },
+    { id: 'reg6',  siswaId: 's3',  ekskulId: 'e1', tanggalDaftar: '2026-09-02' },
+    { id: 'reg7',  siswaId: 's4',  ekskulId: 'e2', tanggalDaftar: '2026-09-01' },
+    { id: 'reg8',  siswaId: 's5',  ekskulId: 'e2', tanggalDaftar: '2026-09-01' },
+    { id: 'reg9',  siswaId: 's5',  ekskulId: 'e3', tanggalDaftar: '2026-09-02' },
+    { id: 'reg10', siswaId: 's6',  ekskulId: 'e5', tanggalDaftar: '2026-09-01' },
+    { id: 'reg11', siswaId: 's7',  ekskulId: 'e3', tanggalDaftar: '2026-09-01' },
+    { id: 'reg12', siswaId: 's7',  ekskulId: 'e1', tanggalDaftar: '2026-09-02' },
+    { id: 'reg13', siswaId: 's8',  ekskulId: 'e4', tanggalDaftar: '2026-09-01' },
+    { id: 'reg14', siswaId: 's9',  ekskulId: 'e1', tanggalDaftar: '2026-09-01' },
+    { id: 'reg15', siswaId: 's9',  ekskulId: 'e2', tanggalDaftar: '2026-09-02' },
+    { id: 'reg16', siswaId: 's10', ekskulId: 'e5', tanggalDaftar: '2026-09-01' },
+    { id: 'reg17', siswaId: 's10', ekskulId: 'e3', tanggalDaftar: '2026-09-02' },
+    { id: 'reg18', siswaId: 's11', ekskulId: 'e2', tanggalDaftar: '2026-09-01' },
+    { id: 'reg19', siswaId: 's12', ekskulId: 'e4', tanggalDaftar: '2026-09-01' },
+    { id: 'reg20', siswaId: 's12', ekskulId: 'e1', tanggalDaftar: '2026-09-02' }
+  ],
+  absensi: [
+    { id: 'a1', ekskulId: 'e1', tanggal: '2026-10-04', siswaId: 's1', status: 'sakit', keterangan: 'Demam tinggi' },
+    { id: 'a2', ekskulId: 'e1', tanggal: '2026-10-11', siswaId: 's1', status: 'alpha', keterangan: 'Tanpa keterangan' },
+    { id: 'a3', ekskulId: 'e1', tanggal: '2026-10-11', siswaId: 's3', status: 'izin',  keterangan: 'Acara keluarga' },
+    { id: 'a4', ekskulId: 'e2', tanggal: '2026-10-06', siswaId: 's1', status: 'izin',  keterangan: 'Urusan keluarga' },
+    { id: 'a5', ekskulId: 'e2', tanggal: '2026-10-06', siswaId: 's5', status: 'sakit', keterangan: 'Kaki terkilir' },
+    { id: 'a6', ekskulId: 'e2', tanggal: '2026-10-13', siswaId: 's4', status: 'alpha', keterangan: 'Tanpa keterangan' },
+    { id: 'a7', ekskulId: 'e3', tanggal: '2026-10-08', siswaId: 's7', status: 'sakit', keterangan: 'Flu & demam' },
+    { id: 'a8', ekskulId: 'e4', tanggal: '2026-10-10', siswaId: 's12',status: 'izin',  keterangan: 'Lomba eksternal' },
+    { id: 'a9', ekskulId: 'e5', tanggal: '2026-10-07', siswaId: 's2', status: 'izin',  keterangan: 'Piknik keluarga' }
+  ]
+};
+
+function isGas() {
+  return typeof google !== 'undefined' && google.script && google.script.run;
+}
+
+function loadLocalDB() {
+  try {
+    var raw = localStorage.getItem(SK);
+    if (raw) {
+      DB = JSON.parse(raw);
+      // Sinkronisasi otomatis: pastikan seluruh user bawaan Versi 4 tersedia di DB lokal
+      if (!DB.users || !Array.isArray(DB.users)) {
+        DB.users = JSON.parse(JSON.stringify(DEFAULT_DB.users));
+        saveLocalDB();
+      } else {
+        var existingU = DB.users.map(function(u){ return String(u.username).trim().toLowerCase(); });
+        var needSave = false;
+        (DEFAULT_DB.users || []).forEach(function(du){
+          if (existingU.indexOf(String(du.username).trim().toLowerCase()) < 0) {
+            DB.users.push(JSON.parse(JSON.stringify(du)));
+            needSave = true;
+          }
+        });
+        if (needSave) saveLocalDB();
+      }
+    } else {
+      DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+      saveLocalDB();
+    }
+  } catch(e) {
+    DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+  }
+}
+
+function saveLocalDB() {
+  try { localStorage.setItem(SK, JSON.stringify(DB)); } catch(e){}
+}
+
+function genId() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
+// ============================================================
+// SIMULASI BACKEND LOKAL (STANDALONE OFFLINE PARITY)
+// ============================================================
+function localHandler(fn, args) {
+  loadLocalDB();
+  args = args || [];
+
+  if (fn === 'getAllData') {
+    return {
+      users: DB.users || [],
+      kelas: DB.kelas,
+      ekskul: DB.ekskul,
+      siswa: DB.siswa,
+      keikutsertaan: DB.keikutsertaan,
+      absensi: DB.absensi,
+      appConfig: getAppConfig()
+    };
+  }
+
+  // MANAJEMEN AKUN PENGGUNA (ADMIN)
+  if (fn === 'getUsers') {
+    return DB.users || [];
+  }
+  if (fn === 'addUser') {
+    var u = args[0] || {};
+    u.id = 'u_' + genId();
+    if (!DB.users) DB.users = [];
+    DB.users.push(u);
+    saveLocalDB();
+    return { success: true, id: u.id };
+  }
+  if (fn === 'updateUser') {
+    var u = args[0] || {};
+    var ex = (DB.users || []).find(function(x){ return x.id === u.id; });
+    if (ex) {
+      if (u.name !== undefined) ex.name = u.name;
+      if (u.username !== undefined) ex.username = u.username;
+      if (u.password !== undefined && u.password !== '') ex.password = u.password;
+      if (u.role !== undefined) ex.role = u.role;
+      if (u.ekskulId !== undefined) ex.ekskulId = u.ekskulId;
+      if (u.kelasId !== undefined) ex.kelasId = u.kelasId;
+      saveLocalDB();
+    }
+    return { success: true };
+  }
+  if (fn === 'removeUser') {
+    var id = args[0];
+    DB.users = (DB.users || []).filter(function(x){ return x.id !== id; });
+    saveLocalDB();
+    return { success: true };
+  }
+  if (fn === 'changeUserPassword') {
+    var id = args[0], newPass = args[1];
+    var ex = (DB.users || []).find(function(x){ return x.id === id; });
+    if (ex) {
+      ex.password = newPass;
+      saveLocalDB();
+    }
+    return { success: true };
+  }
+
+  if (fn === 'getAppConfigServer') {
+    return getAppConfig();
+  }
+  if (fn === 'saveAppConfigServer') {
+    return { success: true };
+  }
+  if (fn === 'resetAppConfigServer') {
+    return { success: true };
+  }
+
+  if (fn === 'login') {
+    var u = String(args[0] || '').trim().toLowerCase();
+    var p = String(args[1] || '').trim();
+
+    // 1. Cek users dari DB lokal
+    var found = (DB.users || []).find(function(x){
+      return String(x.username).trim().toLowerCase() === u && String(x.password).trim() === p;
+    });
+    if (found) {
+      return { success: true, user: found };
+    }
+
+    // 2. Fallback cek users dari DEFAULT_DB
+    var foundDef = (DEFAULT_DB.users || []).find(function(x){
+      return String(x.username).trim().toLowerCase() === u && String(x.password).trim() === p;
+    });
+    if (foundDef) {
+      if (!DB.users) DB.users = [];
+      DB.users.push(JSON.parse(JSON.stringify(foundDef)));
+      saveLocalDB();
+      return { success: true, user: foundDef };
+    }
+
+    // 2. Cek siswa (Login via NIS)
+    var foundSiswa = (DB.siswa || []).find(function(s){
+      return String(s.nis).trim().toLowerCase() === u;
+    });
+    if (foundSiswa && (p === '123' || p === String(foundSiswa.nis).trim())) {
+      var kObj = DB.kelas.find(function(k){ return k.id === foundSiswa.kelasId; });
+      return {
+        success: true,
+        user: {
+          id: foundSiswa.id,
+          username: foundSiswa.nis,
+          name: foundSiswa.nama,
+          role: 'siswa',
+          kelasId: foundSiswa.kelasId,
+          kelasName: kObj ? kObj.name : foundSiswa.kelasId,
+          siswaId: foundSiswa.id,
+          nis: foundSiswa.nis
+        }
+      };
+    }
+
+    return { success: false, message: 'Username/NIS atau password salah!' };
+  }
+
+  // Toggle & Set Buka Ekskul
+  if (fn === 'toggleBukaEkskul') {
+    var eid = args[0], stat = (args[1] === 'BUKA') ? 'BUKA' : 'TUTUP';
+    var e = DB.ekskul.find(function(x){ return x.id === eid; });
+    if (e) { e.isBuka = stat; saveLocalDB(); }
+    return { success: true, isBuka: stat };
+  }
+  if (fn === 'setAllBukaEkskul') {
+    var stat = (args[0] === 'BUKA') ? 'BUKA' : 'TUTUP';
+    DB.ekskul.forEach(function(x){ x.isBuka = stat; });
+    saveLocalDB();
+    return { success: true, isBuka: stat };
+  }
+
+  // Keikutsertaan Ekskul
+  if (fn === 'daftarEkskul') {
+    var sid = args[0], eid = args[1], isAdmin = args[2];
+    var e = DB.ekskul.find(function(x){ return x.id === eid; });
+    if (!e) return { success: false, message: 'Ekskul tidak ditemukan!' };
+    if (!isAdmin && (e.isBuka || 'BUKA').toUpperCase() !== 'BUKA') {
+      return { success: false, message: 'Pendaftaran ekskul ' + e.name + ' sedang ditutup!' };
+    }
+    var exists = DB.keikutsertaan.some(function(r){ return r.siswaId === sid && r.ekskulId === eid; });
+    if (exists) return { success: false, message: 'Siswa sudah terdaftar di ekskul ini.' };
+
+    var rec = { id: 'reg_' + genId(), siswaId: sid, ekskulId: eid, tanggalDaftar: new Date().toISOString().split('T')[0] };
+    DB.keikutsertaan.push(rec);
+    saveLocalDB();
+    return { success: true, record: rec };
+  }
+
+  if (fn === 'batalEkskul') {
+    var sid = args[0], eid = args[1], isAdmin = args[2];
+    var e = DB.ekskul.find(function(x){ return x.id === eid; });
+    if (!isAdmin && e && (e.isBuka || 'BUKA').toUpperCase() !== 'BUKA') {
+      return { success: false, message: 'Pendaftaran sudah ditutup. Tidak dapat membatalkan.' };
+    }
+    DB.keikutsertaan = DB.keikutsertaan.filter(function(r){ return !(r.siswaId === sid && r.ekskulId === eid); });
+    saveLocalDB();
+    return { success: true };
+  }
+
+  if (fn === 'adminAddPeserta') {
+    var eid = args[0], sids = Array.isArray(args[1]) ? args[1] : [args[1]];
+    var count = 0;
+    var today = new Date().toISOString().split('T')[0];
+    sids.forEach(function(sid){
+      var exists = DB.keikutsertaan.some(function(r){ return r.siswaId === sid && r.ekskulId === eid; });
+      if (!exists) {
+        DB.keikutsertaan.push({ id: 'reg_' + genId(), siswaId: sid, ekskulId: eid, tanggalDaftar: today });
+        count++;
+      }
+    });
+    saveLocalDB();
+    return { success: true, added: count };
+  }
+
+  if (fn === 'adminRemovePeserta') {
+    var eid = args[0], sid = args[1];
+    DB.keikutsertaan = DB.keikutsertaan.filter(function(r){ return !(r.siswaId === sid && r.ekskulId === eid); });
+    saveLocalDB();
+    return { success: true };
+  }
+
+  if (fn === 'getPesertaEkskul') {
+    var eid = args[0];
+    var regs = DB.keikutsertaan.filter(function(r){ return r.ekskulId === eid; });
+    var kMap = {}; DB.kelas.forEach(function(k){ kMap[k.id] = k.name; });
+    var list = [];
+    regs.forEach(function(r){
+      var s = DB.siswa.find(function(x){ return x.id === r.siswaId; });
+      if (s) {
+        list.push({ id: s.id, nama: s.nama, nis: s.nis, kelasId: s.kelasId, kelasName: kMap[s.kelasId] || s.kelasId, tanggalDaftar: r.tanggalDaftar || '-' });
+      }
+    });
+    list.sort(function(a, b){ return (a.kelasName + a.nama).localeCompare(b.kelasName + b.nama); });
+    return list;
+  }
+
+  if (fn === 'getRekapPresensiSiswa') {
+    var sid = args[0], dari = args[1], sampai = args[2];
+    var s = DB.siswa.find(function(x){ return x.id === sid; });
+    if (!s) return { success: false, message: 'Siswa tidak ditemukan' };
+    var kObj = DB.kelas.find(function(k){ return k.id === s.kelasId; });
+
+    var myRegs = DB.keikutsertaan.filter(function(r){ return r.siswaId === sid; });
+    var myEids = myRegs.map(function(r){ return r.ekskulId; });
+
+    var sesiMap = {};
+    DB.absensi.forEach(function(a){
+      if (myEids.indexOf(a.ekskulId) >= 0) {
+        if (dari && a.tanggal < dari) return;
+        if (sampai && a.tanggal > sampai) return;
+        sesiMap[a.ekskulId + '_' + a.tanggal] = { ekskulId: a.ekskulId, tanggal: a.tanggal };
+      }
+    });
+
+    var myAbs = DB.absensi.filter(function(a){
+      if (a.siswaId !== sid) return false;
+      if (dari && a.tanggal < dari) return false;
+      if (sampai && a.tanggal > sampai) return false;
+      return true;
+    });
+
+    var absMap = {};
+    myAbs.forEach(function(a){ absMap[a.ekskulId + '_' + a.tanggal] = a; });
+
+    var perEkskul = [];
+    var totalSesiAll = Object.keys(sesiMap).length;
+    var tS = 0, tI = 0, tA = 0;
+
+    myEids.forEach(function(eid){
+      var eObj = DB.ekskul.find(function(e){ return e.id === eid; }) || { id: eid, name: eid };
+      var sesiEkskul = 0;
+      for (var k in sesiMap) { if (sesiMap[k].ekskulId === eid) sesiEkskul++; }
+
+      var sCount = 0, iCount = 0, aCount = 0;
+      myAbs.forEach(function(ab){
+        if (ab.ekskulId === eid) {
+          var st = (ab.status || '').toLowerCase();
+          if (st === 'sakit') { sCount++; tS++; }
+          else if (st === 'izin') { iCount++; tI++; }
+          else if (st === 'alpha') { aCount++; tA++; }
+        }
+      });
+      var totAbs = sCount + iCount + aCount;
+      var hadir = Math.max(0, sesiEkskul - totAbs);
+      var pers = sesiEkskul > 0 ? Math.round((hadir / sesiEkskul) * 100) : 100;
+      perEkskul.push({
+        ekskulId: eid, ekskulName: eObj.name, hari: eObj.hari || '-', jam: eObj.jam || '-',
+        totalSesi: sesiEkskul, hadir: hadir, sakit: sCount, izin: iCount, alpha: aCount, totalAbsen: totAbs, persenHadir: pers
+      });
+    });
+
+    var totAbsAll = tS + tI + tA;
+    var totHadirAll = Math.max(0, totalSesiAll - totAbsAll);
+    var persHadirAll = totalSesiAll > 0 ? Math.round((totHadirAll / totalSesiAll) * 100) : 100;
+
+    var riwayat = [];
+    for (var key in sesiMap) {
+      var sInfo = sesiMap[key];
+      var ab = absMap[key];
+      var eObj = DB.ekskul.find(function(e){ return e.id === sInfo.ekskulId; });
+      riwayat.push({
+        tanggal: sInfo.tanggal,
+        ekskulId: sInfo.ekskulId,
+        ekskulName: eObj ? eObj.name : sInfo.ekskulId,
+        status: ab ? ab.status : 'Hadir',
+        keterangan: ab ? ab.keterangan : 'Mengikuti kegiatan'
+      });
+    }
+    riwayat.sort(function(a, b){ return b.tanggal.localeCompare(a.tanggal); });
+
+    return {
+      success: true,
+      siswa: { id: s.id, nama: s.nama, nis: s.nis, kelasName: kObj ? kObj.name : s.kelasId },
+      ringkasan: { totalSesi: totalSesiAll, hadir: totHadirAll, sakit: tS, izin: tI, alpha: tA, totalAbsen: totAbsAll, persenHadir: persHadirAll },
+      perEkskul: perEkskul,
+      riwayat: riwayat
+    };
+  }
+
+  // Absensi & Sesi
+  if (fn === 'getSessionAbsensi') {
+    var eid = args[0], tgl = args[1];
+    return DB.absensi.filter(function(a){ return a.ekskulId === eid && a.tanggal === tgl; });
+  }
+
+  if (fn === 'saveAbsensi') {
+    var eid = args[0], tgl = args[1], list = args[2] || [];
+    DB.absensi = DB.absensi.filter(function(a){ return !(a.ekskulId === eid && a.tanggal === tgl); });
+    var count = 0;
+    list.forEach(function(item){
+      if (item.status && item.status !== 'hadir') {
+        DB.absensi.push({ id: genId(), ekskulId: eid, tanggal: tgl, siswaId: item.siswaId, status: item.status, keterangan: item.keterangan || '' });
+        count++;
+      }
+    });
+    saveLocalDB();
+    return { success: true, count: count };
+  }
+
+  if (fn === 'deleteSession') {
+    var eid = args[0], tgl = args[1];
+    DB.absensi = DB.absensi.filter(function(a){ return !(a.ekskulId === eid && a.tanggal === tgl); });
+    saveLocalDB();
+    return { success: true };
+  }
+
+  if (fn === 'getSesiByEkskul') {
+    var eid = args[0], dari = args[1], sampai = args[2];
+    var map = {};
+    DB.absensi.forEach(function(a){
+      if (eid && a.ekskulId !== eid) return;
+      if (dari && a.tanggal < dari) return;
+      if (sampai && a.tanggal > sampai) return;
+      var k = a.ekskulId + '_' + a.tanggal;
+      if (!map[k]) map[k] = { ekskulId: a.ekskulId, tanggal: a.tanggal, sakit: 0, izin: 0, alpha: 0, total: 0 };
+      var st = (a.status||'').toLowerCase();
+      if (st === 'sakit') map[k].sakit++;
+      else if (st === 'izin') map[k].izin++;
+      else if (st === 'alpha') map[k].alpha++;
+      map[k].total++;
+    });
+    return Object.keys(map).map(function(k){ return map[k]; });
+  }
+
+  if (fn === 'getLaporanKelas') {
+    var kid = args[0], eid = args[1], dari = args[2], sampai = args[3];
+    var slist = DB.siswa.filter(function(s){ return !kid || s.kelasId === kid; });
+    var eMap = {}; DB.ekskul.forEach(function(e){ eMap[e.id] = e.name; });
+
+    var ekskulTotals = {};
+    var rekap = slist.map(function(s){
+      var abs = DB.absensi.filter(function(a){
+        if (a.siswaId !== s.id) return false;
+        if (eid && a.ekskulId !== eid) return false;
+        if (dari && a.tanggal < dari) return false;
+        if (sampai && a.tanggal > sampai) return false;
+        return true;
+      });
+      var sCount = 0, iCount = 0, aCount = 0;
+      var pMap = {};
+      abs.forEach(function(a){
+        var st = (a.status||'').toLowerCase();
+        if (st === 'sakit') sCount++;
+        else if (st === 'izin') iCount++;
+        else if (st === 'alpha') aCount++;
+
+        var rawEid = a.ekskulId;
+        var eName = eMap[rawEid] || rawEid;
+        if (!pMap[rawEid]) pMap[rawEid] = { id: rawEid, name: eName, total: 0, sakit: 0, izin: 0, alpha: 0 };
+        pMap[rawEid].total++;
+        if (st === 'sakit') pMap[rawEid].sakit++;
+        else if (st === 'izin') pMap[rawEid].izin++;
+        else if (st === 'alpha') pMap[rawEid].alpha++;
+
+        if (!ekskulTotals[rawEid]) ekskulTotals[rawEid] = { id: rawEid, name: eName, total: 0 };
+        ekskulTotals[rawEid].total++;
+      });
+      return {
+        siswa: s,
+        sakit: sCount,
+        izin: iCount,
+        alpha: aCount,
+        total: sCount + iCount + aCount,
+        perEkskul: Object.keys(pMap).map(function(k){ return pMap[k]; }),
+        detail: abs
+      };
+    });
+    return {
+      rekap: rekap,
+      ekskulTotals: Object.keys(ekskulTotals).map(function(k){ return ekskulTotals[k]; })
+    };
+  }
+
+  // Master Siswa & Ekskul
+  if (fn === 'addSiswa') {
+    var s = args[0]; s.id = 's_' + genId(); DB.siswa.push(s); saveLocalDB(); return { success: true };
+  }
+  if (fn === 'updateSiswa') {
+    var s = args[0]; var ex = DB.siswa.find(function(x){ return x.id === s.id; });
+    if (ex) { ex.nama = s.nama; ex.kelasId = s.kelasId; ex.nis = s.nis; saveLocalDB(); }
+    return { success: true };
+  }
+  if (fn === 'removeSiswa') {
+    var id = args[0];
+    DB.siswa = DB.siswa.filter(function(x){ return x.id !== id; });
+    DB.keikutsertaan = DB.keikutsertaan.filter(function(x){ return x.siswaId !== id; });
+    DB.absensi = DB.absensi.filter(function(x){ return x.siswaId !== id; });
+    saveLocalDB(); return { success: true };
+  }
+  if (fn === 'importSiswa') {
+    var list = args[0]; list.forEach(function(r){ r.id = 's_' + genId(); DB.siswa.push(r); });
+    saveLocalDB(); return { success: true, count: list.length };
+  }
+
+  if (fn === 'addEkskul') {
+    var e = args[0]; e.id = 'e_' + genId(); if(!e.isBuka) e.isBuka = 'BUKA'; DB.ekskul.push(e); saveLocalDB(); return { success: true };
+  }
+  if (fn === 'updateEkskul') {
+    var e = args[0]; var ex = DB.ekskul.find(function(x){ return x.id === e.id; });
+    if (ex) { ex.name = e.name; ex.hari = e.hari; ex.jam = e.jam; if(e.isBuka) ex.isBuka = e.isBuka; saveLocalDB(); }
+    return { success: true };
+  }
+  if (fn === 'removeEkskul') {
+    var id = args[0];
+    DB.ekskul = DB.ekskul.filter(function(x){ return x.id !== id; });
+    DB.keikutsertaan = DB.keikutsertaan.filter(function(x){ return x.ekskulId !== id; });
+    DB.absensi = DB.absensi.filter(function(x){ return x.ekskulId !== id; });
+    saveLocalDB(); return { success: true };
+  }
+
+  return { success: false, message: 'Fungsi tidak dikenali: ' + fn };
+}
+
+// BRIDGE SERVER / LOCAL
+function callApi(fn, args, cb, eb) {
+  if (isGas()) {
+    var runner = google.script.run
+      .withSuccessHandler(function(res){ if (cb) cb(res); })
+      .withFailureHandler(function(err){
+        console.error('GAS Error:', err);
+        if (eb) eb(err);
+        else showToast('⚠️ Kesalahan: ' + (err.message || err), 'danger');
+      });
+    runner[fn].apply(runner, args || []);
+  } else {
+    setTimeout(function(){
+      try {
+        var res = localHandler(fn, args || []);
+        if (cb) cb(res);
+      } catch(err) {
+        console.error('LocalHandler Error:', err);
+        if (eb) eb(err);
+        else showToast('⚠️ Kesalahan lokal: ' + err.message, 'danger');
+      }
+    }, 40);
+  }
+}
+
+// ============================================================
+// UI NOTIFIKASI & TOAST
+// ============================================================
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = (type === 'danger') ? 'var(--danger)' : (type === 'success') ? 'var(--success)' : 'var(--gray-900)';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// AUTENTIKASI & LOGIN
+// ============================================================
+function quickFill(u, p) {
+  document.getElementById('loginU').value = u;
+  document.getElementById('loginP').value = p;
+  doLogin();
+}
+
+function doLogin() {
+  var u = document.getElementById('loginU').value.trim();
+  var p = document.getElementById('loginP').value.trim();
+  var errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+
+  if (!u || !p) {
+    errEl.textContent = 'Harap isi username/NIS dan password!';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  callApi('login', [u, p], function(res) {
+    if (res && res.success) {
+      CU = res.user;
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('appLayout').style.display = 'block';
+      setupSidebarAndNav();
+      showToast('Selamat datang, ' + CU.name + '!', 'success');
+      
+      // Routing awal sesuai peran langsung ke dashboard masing-masing
+      if (CU.role === 'siswa') goTo('dashboard-siswa');
+      else if (CU.role === 'pelatih') goTo('dashboard-pelatih');
+      else if (CU.role === 'walikelas') goTo('dashboard-walikelas');
+      else goTo('dashboard-admin');
+    } else {
+      errEl.textContent = (res && res.message) ? res.message : 'Login gagal!';
+      errEl.style.display = 'block';
+    }
+  });
+}
+
+function doLogout() {
+  CU = null;
+  var oldBar = document.getElementById('appStickyBar');
+  if (oldBar) oldBar.remove();
+
+  document.getElementById('appLayout').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginU').value = '';
+  document.getElementById('loginP').value = '';
+  closeSidebar();
+}
+
+// ============================================================
+// NAVIGASI & SIDEBAR
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function setupSidebarAndNav() {
+  document.getElementById('sbAv').textContent = (CU.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('sbName').textContent = CU.name;
+  var roleLabels = { admin: 'Administrator', pelatih: 'Pelatih Ekskul', walikelas: 'Wali Kelas', siswa: 'Peserta Didik' };
+  var displayRole = roleLabels[CU.role] || CU.role;
+  if (CU.role === 'pelatih' && CU.ekskulId) {
+    var eObj = ((DB && DB.ekskul) || []).find(function(e){ return e.id === CU.ekskulId; });
+    if (eObj) displayRole = 'Pelatih ' + eObj.name;
+  } else if (CU.role === 'walikelas' && CU.kelasId) {
+    var kObj = ((DB && DB.kelas) || []).find(function(k){ return k.id === CU.kelasId; });
+    if (kObj) displayRole = 'Wali ' + kObj.name;
+  }
+  document.getElementById('sbRole').textContent = displayRole;
+
+  // Environment badge
+  document.getElementById('envBadge').innerHTML = isGas() ?
+    '<span class="badge badge-info">Google Apps Script</span>' :
+    '<span class="badge badge-warning">Offline / Browser Mode</span>';
+
+  // Desktop Sidebar Nav
+  var nav = '';
+  var mbNav = '';
+
+  if (CU.role === 'admin') {
+    nav = '<div class="nav-sec-title">Utama</div>' +
+      '<div class="nav-item" onclick="goTo(\'dashboard-admin\')"><span class="nav-icon">📊</span>Dashboard Admin</div>' +
+      '<div class="nav-sec-title">Data Master</div>' +
+      '<div class="nav-item" onclick="goTo(\'siswa\')"><span class="nav-icon">👨‍🎓</span>Data Siswa (7-9)</div>' +
+      '<div class="nav-item" onclick="goTo(\'ekskul\')"><span class="nav-icon">⚽</span>Data Ekskul</div>' +
+      '<div class="nav-item" onclick="goTo(\'keikutsertaan\')"><span class="nav-icon">👥</span>Peserta & Pendaftaran</div>' +
+      '<div class="nav-item" onclick="goTo(\'manajemen-user\')"><span class="nav-icon">🔐</span>Kelola Akun Pengguna</div>' +
+      '<div class="nav-item" onclick="showLogoConfigModal()"><span class="nav-icon">🎨</span>Ganti Logo & Identitas</div>' +
+      '<div class="nav-sec-title">Absensi</div>' +
+      '<div class="nav-item" onclick="goTo(\'input-absensi\')"><span class="nav-icon">📝</span>Input Ketidakhadiran</div>' +
+      '<div class="nav-item" onclick="goTo(\'laporan-admin\')"><span class="nav-icon">📈</span>Rekap & Unduh</div>';
+
+    mbNav = '<div class="mb-item" onclick="goTo(\'dashboard-admin\')"><span class="mb-icon">📊</span>Beranda</div>' +
+      '<div class="mb-item" onclick="goTo(\'keikutsertaan\')"><span class="mb-icon">👥</span>Peserta</div>' +
+      '<div class="mb-item" onclick="goTo(\'input-absensi\')"><span class="mb-icon">📝</span>Absen</div>' +
+      '<div class="mb-item" onclick="goTo(\'laporan-admin\')"><span class="mb-icon">📈</span>Rekap</div>';
+
+  } else if (CU.role === 'pelatih') {
+    nav = '<div class="nav-sec-title">Utama</div>' +
+      '<div class="nav-item" onclick="goTo(\'dashboard-pelatih\')"><span class="nav-icon">📊</span>Dashboard Pelatih</div>' +
+      '<div class="nav-sec-title">Absensi Siswa</div>' +
+      '<div class="nav-item" onclick="goTo(\'input-absensi\')"><span class="nav-icon">📝</span>Input Ketidakhadiran</div>' +
+      '<div class="nav-item" onclick="goTo(\'riwayat\')"><span class="nav-icon">📅</span>Riwayat Sesi</div>';
+
+    mbNav = '<div class="mb-item" onclick="goTo(\'dashboard-pelatih\')"><span class="mb-icon">📊</span>Beranda</div>' +
+      '<div class="mb-item" onclick="goTo(\'input-absensi\')"><span class="mb-icon">📝</span>Input Absen</div>' +
+      '<div class="mb-item" onclick="goTo(\'riwayat\')"><span class="mb-icon">📅</span>Riwayat</div>';
+
+  } else if (CU.role === 'walikelas') {
+    nav = '<div class="nav-sec-title">Utama</div>' +
+      '<div class="nav-item" onclick="goTo(\'dashboard-walikelas\')"><span class="nav-icon">📊</span>Dashboard Wali Kelas</div>' +
+      '<div class="nav-sec-title">Laporan Rekap</div>' +
+      '<div class="nav-item" onclick="goTo(\'laporan-kelas\')"><span class="nav-icon">📈</span>Rekap Ketidakhadiran</div>' +
+      '<div class="nav-item" onclick="goTo(\'unduh\')"><span class="nav-icon">⬇️</span>Unduh Laporan</div>';
+
+    mbNav = '<div class="mb-item" onclick="goTo(\'dashboard-walikelas\')"><span class="mb-icon">📊</span>Beranda</div>' +
+      '<div class="mb-item" onclick="goTo(\'laporan-kelas\')"><span class="mb-icon">📈</span>Rekap</div>' +
+      '<div class="mb-item" onclick="goTo(\'unduh\')"><span class="mb-icon">⬇️</span>Unduh</div>';
+
+  } else if (CU.role === 'siswa') {
+    nav = '<div class="nav-sec-title">Portal Siswa</div>' +
+      '<div class="nav-item" onclick="goTo(\'dashboard-siswa\')"><span class="nav-icon">🏠</span>Beranda Saya</div>' +
+      '<div class="nav-item" onclick="goTo(\'daftar-ekskul\')"><span class="nav-icon">⚽</span>Pendaftaran Ekskul</div>' +
+      '<div class="nav-item" onclick="goTo(\'presensi-siswa\')"><span class="nav-icon">📈</span>Presensi Saya</div>';
+
+    mbNav = '<div class="mb-item" onclick="goTo(\'dashboard-siswa\')"><span class="mb-icon">🏠</span>Beranda</div>' +
+      '<div class="mb-item" onclick="goTo(\'daftar-ekskul\')"><span class="mb-icon">⚽</span>Daftar Ekskul</div>' +
+      '<div class="mb-item" onclick="goTo(\'presensi-siswa\')"><span class="mb-icon">📈</span>Presensi</div>';
+  }
+
+  document.getElementById('sbNav').innerHTML = nav;
+  document.getElementById('mobileBottomNav').innerHTML = mbNav;
+  renderAllLogos();
+}
+
+function setHeader(title, sub) {
+  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageSub').textContent = sub || '';
+}
+
+function goTo(page, param) {
+  closeSidebar();
+  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.mb-item').forEach(function(el){ el.classList.remove('active'); });
+
+  document.querySelectorAll('.nav-item').forEach(function(el){
+    var oc = el.getAttribute('onclick') || '';
+    if (oc.indexOf("'" + page + "'") >= 0 || (page.indexOf('dashboard') === 0 && oc.indexOf('dashboard') >= 0)) {
+      el.classList.add('active');
+    }
+  });
+  document.querySelectorAll('.mb-item').forEach(function(el){
+    var oc = el.getAttribute('onclick') || '';
+    if (oc.indexOf("'" + page + "'") >= 0 || (page.indexOf('dashboard') === 0 && oc.indexOf('dashboard') >= 0)) {
+      el.classList.add('active');
+    }
+  });
+
+  // Hapus sticky bar lama jika ada
+  var oldBar = document.getElementById('appStickyBar');
+  if (oldBar) oldBar.remove();
+
+  var routes = {
+    'dashboard': renderDashboard,
+    'dashboard-admin': renderDashboardAdmin,
+    'dashboard-pelatih': renderDashboardPelatih,
+    'dashboard-walikelas': renderDashboardWalikelas,
+    'dashboard-siswa': renderDashboardSiswa,
+    'daftar-ekskul': renderDaftarEkskul,
+    'presensi-siswa': renderPresensiSiswa,
+    'keikutsertaan': renderKeikutsertaan,
+    'manajemen-user': renderManajemenUser,
+    'siswa': renderSiswa,
+    'ekskul': renderEkskul,
+    'input-absensi': renderInputAbsensi,
+    'riwayat': renderRiwayat,
+    'laporan-kelas': renderLaporanKelas,
+    'laporan-admin': renderLaporanAdmin,
+    'unduh': renderUnduh
+  };
+
+  if (routes[page]) routes[page](param);
+}
+
+// ============================================================
+// MODAL HELPER
+// ============================================================
+function showModal(title, bodyHtml, footerHtml) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalFooter').innerHTML = footerHtml || '<button class="btn btn-outline" onclick="closeModal()">Tutup</button>';
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+
+function showVersionInfoModal() {
+  var html = '<div style="font-size:13px;line-height:1.6;">' +
+    '<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius-sm);margin-bottom:12px;">' +
+    '<b>⚡ Anda sedang menjalankan Versi 4.0 (Multi-User Dedicated)</b><br>' +
+    'Setiap Pelatih & Wali Kelas memiliki username & password mandiri terikat ke cabang ekskul & kelas masing-masing, serta Manajemen Akun Pengguna oleh Admin.' +
+    '</div>' +
+    '<p>Seluruh versi aplikasi tetap tersedia secara mandiri dengan penyimpanan terisolasi:</p>' +
+    '<ul style="margin:8px 0 12px 18px;">' +
+    '<li><b>Versi 1 (Klasik):</b> Multi-akun terikat cabang & kelas (<code>versi-1/index.html</code>)</li>' +
+    '<li><b>Versi 2 (Universal):</b> Universal coach & homeroom teacher (<code>versi-2/index.html</code>)</li>' +
+    '<li><b>Versi 3 (Portal Siswa):</b> Pendaftaran mandiri siswa, filter peserta, & kelola logo (<code>versi-3/index.html</code>)</li>' +
+    '<li><b>Versi 4 (Aktif):</b> Multi-User Mandiri Pelatih & Wali Kelas + Manajemen Akun Pengguna.</li>' +
+    '</ul>' +
+    '<div style="padding:8px 10px;background:var(--warning-light);border-radius:var(--radius-sm);font-size:12px;color:#92400E;">' +
+    '💡 <em>Kunci penyimpanan lokal terisolasi khusus Versi 4 (<code>rekapEkskul_v4_multi</code>) sehingga data Anda aman dari bentrok versi lainnya.</em>' +
+    '</div>' +
+    '</div>';
+  showModal('Informasi Versi Aplikasi', html, '<button class="btn btn-primary" onclick="closeModal()">Mengerti</button>');
+}
+
+// ============================================================
+// 1. DASHBOARD SISWA & REKAP PRESENSI SAYA (PORTAL SISWA)
+// ============================================================
+function renderDashboardSiswa() {
+  setHeader('Beranda Saya', 'Portal Peserta Didik — Rekap Kehadiran & Ekskul');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;"><span style="font-size:24px;">⏳</span> Memuat data siswa...</div>';
+
+  callApi('getRekapPresensiSiswa', [CU.siswaId], function(res) {
+    if (!res || !res.success) {
+      ca.innerHTML = '<div class="card"><p class="text-danger">Gagal memuat data presensi siswa.</p></div>';
+      return;
+    }
+
+    var s = res.siswa;
+    var r = res.ringkasan;
+    var pe = res.perEkskul || [];
+
+    var ekskulPills = pe.length > 0 ? pe.map(function(e){
+      return '<span class="badge badge-primary" style="font-size:12px;padding:4px 10px;">⚽ ' + e.ekskulName + '</span>';
+    }).join(' ') : '<span class="text-muted">Belum terdaftar di ekskul manapun.</span>';
+
+    var html = '' +
+      '<div class="card" style="background:linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);color:#fff;border:none;">' +
+        '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">' +
+          '<div style="width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:26px;">👨‍🎓</div>' +
+          '<div style="flex:1;">' +
+            '<h3 style="color:#fff;font-size:18px;">' + s.nama + '</h3>' +
+            '<div style="font-size:12px;color:var(--primary-subtle);margin-top:2px;">NIS: ' + s.nis + ' • Kelas: ' + s.kelasName + '</div>' +
+          '</div>' +
+          '<div>' +
+            '<button class="btn btn-sm btn-outline" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);" onclick="goTo(\'daftar-ekskul\')">➕ Daftar Ekskul Lain</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+          '<span style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--primary-subtle);">Ekskul Diikuti:</span> ' +
+          ekskulPills +
+        '</div>' +
+      '</div>' +
+
+      // STATISTIK KEHADIRAN CEPAT
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px;margin-bottom:16px;">' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Total Sesi</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--gray-800);">' + r.totalSesi + '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;">' +
+          '<div style="font-size:11px;color:var(--success);font-weight:600;">Hadir</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--success);">' + r.hadir + '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;">' +
+          '<div style="font-size:11px;color:var(--warning);font-weight:600;">Sakit</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--warning);">' + r.sakit + '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;">' +
+          '<div style="font-size:11px;color:var(--info);font-weight:600;">Izin</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--info);">' + r.izin + '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;">' +
+          '<div style="font-size:11px;color:var(--danger);font-weight:600;">Alpha</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--danger);">' + r.alpha + '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:12px;text-align:center;margin-bottom:0;background:var(--primary-light);border-color:var(--primary-subtle);">' +
+          '<div style="font-size:11px;color:var(--primary-dark);font-weight:700;">Kehadiran</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--primary);">' + r.persenHadir + '%</div>' +
+        '</div>' +
+      '</div>' +
+
+      // EKSTRAKURIKULER SAYA (CARDS)
+      '<div class="card">' +
+        '<div class="card-header">' +
+          '<h3 class="card-title">⚽ Rincian Ekskul yang Diikuti</h3>' +
+          '<button class="btn btn-sm btn-outline" onclick="goTo(\'presensi-siswa\')">Lihat Riwayat Lengkap ➔</button>' +
+        '</div>';
+
+    if (pe.length === 0) {
+      html += '<div class="text-center" style="padding:30px 20px;">' +
+        '<div style="font-size:36px;margin-bottom:10px;">📋</div>' +
+        '<h4>Anda Belum Terdaftar di Ekstrakurikuler</h4>' +
+        '<p class="text-muted" style="margin:6px 0 14px;">Silakan pilih dan daftarkan diri pada kegiatan ekstra yang Anda minati.</p>' +
+        '<button class="btn btn-primary" onclick="goTo(\'daftar-ekskul\')">Daftar Ekstrakurikuler Sekarang</button>' +
+      '</div>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px;">';
+      pe.forEach(function(e) {
+        html += '<div style="padding:14px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">' +
+            '<div>' +
+              '<h4 style="font-size:14px;">' + e.ekskulName + '</h4>' +
+              '<div style="font-size:11px;color:var(--gray-500);">📅 ' + e.hari + ' • ⏰ ' + e.jam + '</div>' +
+            '</div>' +
+            '<span class="badge badge-primary">' + e.persenHadir + '% Hadir</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;font-size:11px;font-weight:600;margin-top:10px;">' +
+            '<span style="color:var(--success);">✅ Hadir: ' + e.hadir + '</span> • ' +
+            '<span style="color:var(--warning);">🟡 Sakit: ' + e.sakit + '</span> • ' +
+            '<span style="color:var(--info);">🔵 Izin: ' + e.izin + '</span> • ' +
+            '<span style="color:var(--danger);">🔴 Alpha: ' + e.alpha + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    ca.innerHTML = html;
+  });
+}
+
+// ============================================================
+// 2. PENDAFTARAN EKSTRAKURIKULER (SISWA)
+// ============================================================
+function renderDaftarEkskul() {
+  setHeader('Pendaftaran Ekstrakurikuler', 'Katalog kegiatan ekstra & formulir pendaftaran siswa');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat katalog ekstrakurikuler...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allEkskul = data.ekskul || [];
+    var allReg = data.keikutsertaan || [];
+    var myRegs = allReg.filter(function(r){ return r.siswaId === CU.siswaId; });
+    var myEids = myRegs.map(function(r){ return r.ekskulId; });
+
+    var html = '' +
+      '<div class="card" style="margin-bottom:14px;background:var(--primary-light);border-color:var(--primary-subtle);">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span style="font-size:24px;">💡</span>' +
+          '<div style="font-size:12px;color:var(--primary-dark);">' +
+            '<b>Petunjuk Siswa:</b> Anda dapat mendaftar lebih dari satu ekstrakurikuler selama jadwal latihan tidak bentrok. Pendaftaran hanya dapat dilakukan jika status pendaftaran <b>BUKA</b>.' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;">';
+
+    allEkskul.forEach(function(e) {
+      var isJoined = myEids.indexOf(e.id) >= 0;
+      var isOpen = (e.isBuka || 'BUKA').toUpperCase() === 'BUKA';
+      var regCount = allReg.filter(function(r){ return r.ekskulId === e.id; }).length;
+
+      html += '<div class="card" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between;' + (isJoined ? 'border:2px solid var(--primary);' : '') + '">' +
+        '<div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">' +
+            '<h3 style="font-size:16px;">⚽ ' + e.name + '</h3>' +
+            (isOpen ? '<span class="badge badge-success">🟢 Pendaftaran Buka</span>' : '<span class="badge badge-danger">🔴 Pendaftaran Ditutup</span>') +
+          '</div>' +
+          '<p style="font-size:12px;color:var(--gray-600);margin-bottom:12px;">' + (e.deskripsi || 'Kegiatan ekstrakurikuler sekolah untuk melatih bakat dan minat.') + '</p>' +
+          '<div style="font-size:12px;color:var(--gray-700);margin-bottom:14px;background:var(--gray-50);padding:8px 10px;border-radius:var(--radius-sm);">' +
+            '<div>📅 <b>Jadwal:</b> ' + e.hari + ', ' + e.jam + '</div>' +
+            '<div style="margin-top:3px;">👥 <b>Peserta Terdaftar:</b> ' + regCount + ' siswa</div>' +
+          '</div>' +
+        '</div>' +
+        '<div>';
+
+      if (isJoined) {
+        html += '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div class="badge badge-primary" style="flex:1;justify-content:center;padding:8px;font-size:12px;">✅ Sudah Terdaftar</div>' +
+          (isOpen ? '<button class="btn btn-outline btn-sm btn-danger" onclick="batalEkskulAction(\'' + e.id + '\',\'' + e.name + '\')">Batal</button>' : '') +
+        '</div>';
+      } else {
+        if (isOpen) {
+          html += '<button class="btn btn-primary btn-full" onclick="daftarEkskulAction(\'' + e.id + '\',\'' + e.name + '\')">➕ Daftar Ekstra Ini</button>';
+        } else {
+          html += '<button class="btn btn-outline btn-full" disabled style="opacity:0.6;cursor:not-allowed;">🔒 Pendaftaran Ditutup</button>';
+        }
+      }
+
+      html += '</div></div>';
+    });
+
+    html += '</div>';
+    ca.innerHTML = html;
+  });
+}
+
+function daftarEkskulAction(ekskulId, ekskulName) {
+  if (!confirm('Apakah Anda yakin ingin mendaftar ke ekstrakurikuler ' + ekskulName + '?')) return;
+  callApi('daftarEkskul', [CU.siswaId, ekskulId, false], function(res) {
+    if (res && res.success) {
+      showToast('🎉 Berhasil mendaftar ke ' + ekskulName + '!', 'success');
+      renderDaftarEkskul();
+    } else {
+      showToast('⚠️ ' + (res.message || 'Gagal mendaftar'), 'danger');
+    }
+  });
+}
+
+function batalEkskulAction(ekskulId, ekskulName) {
+  if (!confirm('Apakah Anda yakin ingin membatalkan pendaftaran dari ' + ekskulName + '?')) return;
+  callApi('batalEkskul', [CU.siswaId, ekskulId, false], function(res) {
+    if (res && res.success) {
+      showToast('Pendaftaran dibatalkan.', 'success');
+      renderDaftarEkskul();
+    } else {
+      showToast('⚠️ ' + (res.message || 'Gagal membatalkan'), 'danger');
+    }
+  });
+}
+
+// ============================================================
+// 3. REKAP PRESENSI LENGKAP SISWA (PORTAL SISWA)
+// ============================================================
+function renderPresensiSiswa() {
+  setHeader('Presensi Saya', 'Riwayat kehadiran & persentase keikutsertaan latihan');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat laporan kehadiran...</div>';
+
+  callApi('getRekapPresensiSiswa', [CU.siswaId], function(res) {
+    if (!res || !res.success) {
+      ca.innerHTML = '<div class="card"><p class="text-danger">Gagal memuat presensi.</p></div>';
+      return;
+    }
+
+    var r = res.ringkasan;
+    var rw = res.riwayat || [];
+
+    var html = '' +
+      '<div class="card">' +
+        '<div class="card-header">' +
+          '<h3 class="card-title">📊 Rangkuman Kehadiran Anda</h3>' +
+          '<span class="badge badge-primary" style="font-size:13px;padding:5px 12px;">' + r.persenHadir + '% Tingkat Hadir</span>' +
+        '</div>' +
+        '<div style="background:var(--gray-200);height:8px;border-radius:9999px;overflow:hidden;margin-bottom:14px;">' +
+          '<div style="background:var(--success);height:100%;width:' + r.persenHadir + '%;"></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:12px;font-size:12px;flex-wrap:wrap;">' +
+          '<div><b>Total Pertemuan:</b> ' + r.totalSesi + ' sesi</div>' +
+          '<div><b>Hadir:</b> <span style="color:var(--success);font-weight:700;">' + r.hadir + '</span></div>' +
+          '<div><b>Sakit:</b> <span style="color:var(--warning);font-weight:700;">' + r.sakit + '</span></div>' +
+          '<div><b>Izin:</b> <span style="color:var(--info);font-weight:700;">' + r.izin + '</span></div>' +
+          '<div><b>Alpha:</b> <span style="color:var(--danger);font-weight:700;">' + r.alpha + '</span></div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card">' +
+        '<div class="card-header">' +
+          '<h3 class="card-title">📅 Riwayat Pertemuan Latihan</h3>' +
+          '<span class="badge badge-gray">' + rw.length + ' Catatan</span>' +
+        '</div>';
+
+    if (rw.length === 0) {
+      html += '<p class="text-muted text-center" style="padding:20px;">Belum ada riwayat pertemuan atau absensi yang tercatat.</p>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+      rw.forEach(function(item) {
+        var st = (item.status || 'Hadir').toLowerCase();
+        var badgeCls = st === 'hadir' ? 'badge-success' : st === 'sakit' ? 'badge-warning' : st === 'izin' ? 'badge-info' : 'badge-danger';
+        var icon = st === 'hadir' ? '✅' : st === 'sakit' ? '🟡' : st === 'izin' ? '🔵' : '🔴';
+
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:#fff;gap:10px;">' +
+          '<div>' +
+            '<div style="font-weight:700;font-size:13px;">' + item.ekskulName + '</div>' +
+            '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">📅 ' + item.tanggal + ' • <em>' + (item.keterangan || '-') + '</em></div>' +
+          '</div>' +
+          '<div>' +
+            '<span class="badge ' + badgeCls + '" style="font-size:12px;padding:4px 10px;">' + icon + ' ' + (item.status ? item.status.toUpperCase() : 'HADIR') + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    ca.innerHTML = html;
+  });
+}
+
+// ============================================================
+// 4. KELOLA PESERTA & PENDAFTARAN EKSKUL (ADMIN)
+// ============================================================
+function renderKeikutsertaan() {
+  setHeader('Kelola Peserta & Pendaftaran', 'Buka/tutup pendaftaran dan atur peserta per ekskul');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat data keikutsertaan...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allEkskul = data.ekskul || [];
+    var allReg = data.keikutsertaan || [];
+    var allSiswa = data.siswa || [];
+    var allKelas = data.kelas || [];
+
+    var html = '' +
+      '<div class="card" style="margin-bottom:14px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+          '<div>' +
+            '<h3 class="card-title">⚡ Status Pendaftaran Global</h3>' +
+            '<p class="text-muted" style="font-size:12px;">Kontrol cepat untuk membuka atau menutup pendaftaran semua ekstrakurikuler sekaligus.</p>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="btn btn-sm btn-success" onclick="bulkSetPendaftaran(\'BUKA\')">🟢 Buka Semua</button>' +
+            '<button class="btn btn-sm btn-danger" onclick="bulkSetPendaftaran(\'TUTUP\')">🔴 Tutup Semua</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card">' +
+        '<div class="card-header">' +
+          '<h3 class="card-title">⚽ Daftar Ekskul & Peserta</h3>' +
+        '</div>' +
+        '<div style="margin-bottom:14px;">' +
+          '<label class="form-label">Pilih Ekstrakurikuler yang Ingin Dikelola:</label>' +
+          '<select id="keikutsertaanEkskulSelect" class="form-control" onchange="renderPesertaTable()">' +
+            allEkskul.map(function(e){
+              var count = allReg.filter(function(r){ return r.ekskulId === e.id; }).length;
+              return '<option value="' + e.id + '">' + e.name + ' (' + count + ' peserta) — [' + (e.isBuka || 'BUKA') + ']</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div id="pesertaTableArea"></div>' +
+      '</div>';
+
+    ca.innerHTML = html;
+    renderPesertaTable();
+  });
+}
+
+function bulkSetPendaftaran(status) {
+  if (!confirm('Apakah Anda yakin ingin mengatur pendaftaran SEMUA ekskul menjadi: ' + status + '?')) return;
+  callApi('setAllBukaEkskul', [status], function(res) {
+    if (res && res.success) {
+      showToast('Status pendaftaran semua ekskul diperbarui: ' + status, 'success');
+      renderKeikutsertaan();
+    }
+  });
+}
+
+function toggleEkskulBukaStatus(eid, currentStatus) {
+  var newStat = (currentStatus === 'BUKA') ? 'TUTUP' : 'BUKA';
+  callApi('toggleBukaEkskul', [eid, newStat], function(res) {
+    if (res && res.success) {
+      showToast('Status pendaftaran ekskul diubah menjadi: ' + newStat, 'success');
+      renderKeikutsertaan();
+    }
+  });
+}
+
+function renderPesertaTable() {
+  var eid = document.getElementById('keikutsertaanEkskulSelect').value;
+  var area = document.getElementById('pesertaTableArea');
+  area.innerHTML = '<div class="text-center" style="padding:20px;">⏳ Memuat daftar peserta...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var e = (data.ekskul || []).find(function(x){ return x.id === eid; });
+    var isOpen = (e && (e.isBuka || 'BUKA').toUpperCase() === 'BUKA');
+    var peserta = [];
+
+    var regs = (data.keikutsertaan || []).filter(function(r){ return r.ekskulId === eid; });
+    var kMap = {}; (data.kelas || []).forEach(function(k){ kMap[k.id] = k.name; });
+
+    regs.forEach(function(r){
+      var s = (data.siswa || []).find(function(x){ return x.id === r.siswaId; });
+      if (s) {
+        peserta.push({
+          id: s.id, nama: s.nama, nis: s.nis,
+          kelasName: kMap[s.kelasId] || s.kelasId,
+          tanggalDaftar: r.tanggalDaftar || '-'
+        });
+      }
+    });
+
+    peserta.sort(function(a, b){ return (a.kelasName + a.nama).localeCompare(b.kelasName + b.nama); });
+
+    var html = '' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:12px;flex-wrap:wrap;gap:8px;">' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:14px;">' + (e ? e.name : '') + '</div>' +
+          '<div style="font-size:12px;color:var(--gray-500);">' +
+            'Status: ' + (isOpen ? '<span class="badge badge-success">🟢 Pendaftaran Buka</span>' : '<span class="badge badge-danger">🔴 Pendaftaran Ditutup</span>') +
+            ' • Total Peserta: <b>' + peserta.length + ' siswa</b>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="btn btn-sm ' + (isOpen ? 'btn-danger' : 'btn-success') + '" onclick="toggleEkskulBukaStatus(\'' + eid + '\',\'' + (isOpen ? 'BUKA' : 'TUTUP') + '\')">' +
+            (isOpen ? '🔴 Tutup Pendaftaran' : '🟢 Buka Pendaftaran') +
+          '</button>' +
+          '<button class="btn btn-sm btn-primary" onclick="showAddPesertaModal(\'' + eid + '\',\'' + (e ? e.name : '') + '\')">➕ Tambah Peserta</button>' +
+        '</div>' +
+      '</div>';
+
+    if (peserta.length === 0) {
+      html += '<p class="text-muted text-center" style="padding:24px;">Belum ada siswa yang terdaftar di ekstrakurikuler ini.</p>';
+    } else {
+      html += '<div class="table-wrap"><table>' +
+        '<thead><tr>' +
+          '<th style="width:40px;">No</th><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Tanggal Daftar</th><th style="width:80px;text-align:center;">Aksi</th>' +
+        '</tr></thead><tbody>';
+
+      peserta.forEach(function(p, idx) {
+        html += '<tr>' +
+          '<td>' + (idx + 1) + '</td>' +
+          '<td><b>' + p.nis + '</b></td>' +
+          '<td>' + p.nama + '</td>' +
+          '<td><span class="badge badge-gray">' + p.kelasName + '</span></td>' +
+          '<td>' + p.tanggalDaftar + '</td>' +
+          '<td style="text-align:center;">' +
+            '<button class="btn btn-sm btn-outline btn-danger" style="padding:3px 8px;font-size:11px;" onclick="removePesertaAction(\'' + eid + '\',\'' + p.id + '\',\'' + p.nama + '\')">Hapus</button>' +
+          '</td>' +
+        '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+    }
+
+    area.innerHTML = html;
+  });
+}
+
+function showAddPesertaModal(eid, ekskulName) {
+  callApi('getAllData', [], function(data) {
+    var allSiswa = data.siswa || [];
+    var allReg = data.keikutsertaan || [];
+    var registeredSids = allReg.filter(function(r){ return r.ekskulId === eid; }).map(function(r){ return r.siswaId; });
+    var kMap = {}; (data.kelas || []).forEach(function(k){ kMap[k.id] = k.name; });
+
+    var available = allSiswa.filter(function(s){ return registeredSids.indexOf(s.id) < 0; });
+
+    var body = '<div style="font-size:12px;margin-bottom:10px;">Pilih siswa dari daftar di bawah untuk ditambahkan ke <b>' + ekskulName + '</b>:</div>' +
+      '<input type="text" id="modalSearchSiswa" class="form-control" placeholder="🔍 Cari nama atau NIS..." oninput="filterModalSiswaList()" style="margin-bottom:10px;">' +
+      '<div id="modalSiswaList" style="max-height:260px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px;">';
+
+    if (available.length === 0) {
+      body += '<p class="text-muted text-center" style="padding:16px;">Semua siswa sudah terdaftar di ekskul ini.</p>';
+    } else {
+      available.forEach(function(s){
+        body += '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--gray-100);cursor:pointer;" class="modal-siswa-item" data-text="' + (s.nama + ' ' + s.nis).toLowerCase() + '">' +
+          '<input type="checkbox" name="chkSiswaModal" value="' + s.id + '">' +
+          '<div><b>' + s.nama + '</b> <span class="text-muted">(' + s.nis + ' • ' + (kMap[s.kelasId] || s.kelasId) + ')</span></div>' +
+        '</label>';
+      });
+    }
+    body += '</div>';
+
+    var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button>' +
+      '<button class="btn btn-primary" onclick="submitAddPesertaModal(\'' + eid + '\')">Tambahkan Siswa Terpilih</button>';
+
+    showModal('Tambah Peserta — ' + ekskulName, body, footer);
+  });
+}
+
+function filterModalSiswaList() {
+  var q = (document.getElementById('modalSearchSiswa').value || '').toLowerCase();
+  document.querySelectorAll('.modal-siswa-item').forEach(function(el){
+    var text = el.getAttribute('data-text') || '';
+    el.style.display = (text.indexOf(q) >= 0) ? 'flex' : 'none';
+  });
+}
+
+function submitAddPesertaModal(eid) {
+  var chks = document.querySelectorAll('input[name="chkSiswaModal"]:checked');
+  var sids = [];
+  chks.forEach(function(c){ sids.push(c.value); });
+  if (sids.length === 0) {
+    alert('Pilih minimal satu siswa!');
+    return;
+  }
+  callApi('adminAddPeserta', [eid, sids], function(res){
+    if (res && res.success) {
+      closeModal();
+      showToast('Berhasil menambahkan ' + (res.added || sids.length) + ' peserta!', 'success');
+      renderPesertaTable();
+    }
+  });
+}
+
+function removePesertaAction(eid, sid, sName) {
+  if (!confirm('Apakah Anda yakin ingin mengeluarkan ' + sName + ' dari ekstrakurikuler ini?')) return;
+  callApi('adminRemovePeserta', [eid, sid], function(res){
+    if (res && res.success) {
+      showToast('Peserta dikeluarkan.', 'success');
+      renderPesertaTable();
+    }
+  });
+}
+
+// ============================================================
+// 4B. MANAJEMEN AKUN PENGGUNA (PELATIH & WALI KELAS OLEH ADMIN)
+// ============================================================
+function renderManajemenUser() {
+  setHeader('Kelola Akun Pengguna', 'Atur username, password, dan penugasan individual Pelatih & Wali Kelas');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat data akun pengguna...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var users = data.users || [];
+    var ekskul = data.ekskul || [];
+    var kelas = data.kelas || [];
+
+    var eMap = {}; ekskul.forEach(function(e){ eMap[e.id] = e.name; });
+    var kMap = {}; kelas.forEach(function(k){ kMap[k.id] = k.name; });
+
+    var nAdmin = users.filter(function(u){ return u.role === 'admin'; }).length;
+    var nPelatih = users.filter(function(u){ return u.role === 'pelatih'; }).length;
+    var nWali = users.filter(function(u){ return u.role === 'walikelas'; }).length;
+    var nSiswa = users.filter(function(u){ return u.role === 'siswa'; }).length;
+
+    var html = '' +
+      // INFO CARD
+      '<div class="card" style="background:var(--primary-light);border-color:var(--primary-subtle);margin-bottom:14px;">' +
+        '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+          '<span style="font-size:24px;line-height:1;">🔐</span>' +
+          '<div style="font-size:12px;color:var(--primary-dark);line-height:1.5;">' +
+            '<b>Sistem Multi-User Versi 4.0:</b> Setiap Pelatih dan Wali Kelas memiliki username & password mandiri. ' +
+            'Akun Pelatih terikat langsung ke cabang binaannya, sedangkan akun Wali Kelas terikat ke rombel binaannya. ' +
+            'Admin dapat menambahkan akun baru, memperbarui penugasan, atau mereset password kapan saja.' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // 4 STATS USERS
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:10px;margin-bottom:14px;">' +
+        '<div class="card" style="margin-bottom:0;padding:12px;text-align:center;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Total Akun</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--gray-800);">' + users.length + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:12px;text-align:center;">' +
+          '<div style="font-size:11px;color:var(--primary);font-weight:600;">Pelatih Ekskul</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--primary);">' + nPelatih + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:12px;text-align:center;">' +
+          '<div style="font-size:11px;color:#0f766e;font-weight:600;">Wali Kelas</div>' +
+          '<div style="font-size:22px;font-weight:800;color:#0f766e;">' + nWali + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:12px;text-align:center;">' +
+          '<div style="font-size:11px;color:var(--info);font-weight:600;">Administrator</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--info);">' + nAdmin + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // TOOLBAR
+      '<div class="card">' +
+        '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<input type="text" id="userSearchInput" class="form-control" placeholder="🔍 Cari nama / username..." oninput="filterUserTableRows()" style="max-width:240px;font-size:12px;padding:6px 10px;">' +
+            '<select id="userRoleFilter" class="form-control" onchange="filterUserTableRows()" style="max-width:160px;font-size:12px;padding:6px 10px;">' +
+              '<option value="">Semua Peran</option>' +
+              '<option value="pelatih">Pelatih Ekskul</option>' +
+              '<option value="walikelas">Wali Kelas</option>' +
+              '<option value="admin">Administrator</option>' +
+              '<option value="siswa">Peserta Didik</option>' +
+            '</select>' +
+          '</div>' +
+          '<div>' +
+            '<button class="btn btn-sm btn-primary" onclick="showAddUserModal()">➕ Tambah Akun Pengguna</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="table-responsive"><table class="table" id="userManagementTable">' +
+          '<thead><tr>' +
+            '<th style="width:40px;">No</th>' +
+            '<th>Nama Lengkap</th>' +
+            '<th>Username</th>' +
+            '<th>Peran (Role)</th>' +
+            '<th>Penugasan Khusus</th>' +
+            '<th style="width:120px;">Password</th>' +
+            '<th style="width:140px;text-align:center;">Aksi</th>' +
+          '</tr></thead>' +
+          '<tbody>';
+
+    users.forEach(function(u, idx) {
+      var roleBadge = '';
+      if (u.role === 'admin') roleBadge = '<span class="badge badge-info">Admin</span>';
+      else if (u.role === 'pelatih') roleBadge = '<span class="badge badge-primary">Pelatih</span>';
+      else if (u.role === 'walikelas') roleBadge = '<span class="badge badge-success" style="background:#0f766e;color:#fff;">Wali Kelas</span>';
+      else if (u.role === 'siswa') roleBadge = '<span class="badge badge-gray">Siswa</span>';
+
+      var penugasan = '-';
+      if (u.role === 'pelatih') {
+        penugasan = u.ekskulId ? ('⚽ ' + (eMap[u.ekskulId] || u.ekskulId)) : '<span class="text-muted">🌐 Koordinator (Semua)</span>';
+      } else if (u.role === 'walikelas') {
+        penugasan = u.kelasId ? ('🏫 ' + (kMap[u.kelasId] || u.kelasId)) : '<span class="text-muted">🌐 Koordinator (Semua)</span>';
+      } else if (u.role === 'siswa') {
+        penugasan = u.kelasId ? ('Kelas ' + (kMap[u.kelasId] || u.kelasId)) : '-';
+      } else if (u.role === 'admin') {
+        penugasan = '⭐ Akses Penuh Sistem';
+      }
+
+      var passMasked = '<span id="passSpan_' + u.id + '" style="font-family:monospace;font-size:12px;background:var(--gray-100);padding:2px 6px;border-radius:4px;">••••••</span> ' +
+        '<button type="button" class="btn btn-sm" style="padding:1px 5px;font-size:10px;background:transparent;border:1px solid var(--gray-300);" onclick="toggleViewPass(\'' + u.id + '\',\'' + escapeHtml(u.password) + '\')">👁️</button>';
+
+      var isPrimaryAdmin = (u.username === 'admin');
+
+      html += '<tr class="user-row" data-role="' + u.role + '" data-name="' + escapeHtml((u.name || '') + ' ' + (u.username || '')).toLowerCase() + '">' +
+        '<td>' + (idx + 1) + '</td>' +
+        '<td><b>' + escapeHtml(u.name) + '</b></td>' +
+        '<td><code>' + escapeHtml(u.username) + '</code></td>' +
+        '<td>' + roleBadge + '</td>' +
+        '<td>' + penugasan + '</td>' +
+        '<td>' + passMasked + '</td>' +
+        '<td style="text-align:center;">' +
+          '<div style="display:inline-flex;gap:4px;">' +
+            '<button class="btn btn-sm btn-outline" style="padding:2px 8px;font-size:11px;" title="Ganti Password" onclick="showChangePasswordModal(\'' + u.id + '\',\'' + escapeHtml(u.username) + '\',\'' + escapeHtml(u.name) + '\')">🔑</button>' +
+            '<button class="btn btn-sm btn-outline" style="padding:2px 8px;font-size:11px;" title="Edit Akun" onclick="showEditUserModal(\'' + u.id + '\')">✏️</button>' +
+            (!isPrimaryAdmin ?
+              '<button class="btn btn-sm btn-outline btn-danger" style="padding:2px 8px;font-size:11px;" title="Hapus Akun" onclick="deleteUserAction(\'' + u.id + '\',\'' + escapeHtml(u.username) + '\',\'' + u.role + '\')">🗑️</button>' :
+              '<button class="btn btn-sm btn-outline" style="padding:2px 8px;font-size:11px;opacity:0.3;cursor:not-allowed;" title="Admin utama tidak dapat dihapus" disabled>🔒</button>') +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+    ca.innerHTML = html;
+  });
+}
+
+function toggleViewPass(uid, pass) {
+  var el = document.getElementById('passSpan_' + uid);
+  if (!el) return;
+  if (el.textContent === '••••••') {
+    el.textContent = pass;
+    el.style.background = '#fef3c7';
+    el.style.color = '#92400e';
+    el.style.fontWeight = 'bold';
+  } else {
+    el.textContent = '••••••';
+    el.style.background = 'var(--gray-100)';
+    el.style.color = 'inherit';
+    el.style.fontWeight = 'normal';
+  }
+}
+
+function filterUserTableRows() {
+  var q = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
+  var rf = (document.getElementById('userRoleFilter').value || '').trim();
+  document.querySelectorAll('.user-row').forEach(function(row) {
+    var r = row.getAttribute('data-role') || '';
+    var text = row.getAttribute('data-name') || '';
+    var matchQ = !q || (text.indexOf(q) >= 0);
+    var matchR = !rf || (r === rf);
+    row.style.display = (matchQ && matchR) ? '' : 'none';
+  });
+}
+
+function showAddUserModal() {
+  callApi('getAllData', [], function(data){
+    var ekskul = data.ekskul || [];
+    var kelas = data.kelas || [];
+
+    var body = '' +
+      '<div class="form-group">' +
+        '<label class="form-label">Nama Lengkap Pengguna <span style="color:var(--danger)">*</span></label>' +
+        '<input type="text" id="addUserName" class="form-control" placeholder="Contoh: Coach Budi Santoso / Ibu Siti Rahayu, S.Pd.">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Username Login <span style="color:var(--danger)">*</span></label>' +
+        '<input type="text" id="addUserUsername" class="form-control" placeholder="Contoh: pelatih_renang / wali_7c">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Password <span style="color:var(--danger)">*</span></label>' +
+        '<input type="text" id="addUserPassword" class="form-control" value="123" placeholder="Minimal 3 karakter">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Peran Pengguna (Role)</label>' +
+        '<select id="addUserRole" class="form-control" onchange="onAddUserRoleChanged()">' +
+          '<option value="pelatih">Pelatih Ekskul</option>' +
+          '<option value="walikelas">Wali Kelas</option>' +
+          '<option value="admin">Administrator</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="form-group" id="groupAddUserEkskul">' +
+        '<label class="form-label">Cabang Ekskul yang Diampu</label>' +
+        '<select id="addUserEkskul" class="form-control">' +
+          '<option value="">(Universal / Koordinator Seluruh Ekskul)</option>' +
+          ekskul.map(function(e){ return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('') +
+        '</select>' +
+      '</div>' +
+      '<div class="form-group" id="groupAddUserKelas" style="display:none;">' +
+        '<label class="form-label">Rombel / Kelas Binaan</label>' +
+        '<select id="addUserKelas" class="form-control">' +
+          '<option value="">(Universal / Koordinator Seluruh Kelas)</option>' +
+          kelas.map(function(k){ return '<option value="' + k.id + '">' + k.name + '</option>'; }).join('') +
+        '</select>' +
+      '</div>';
+
+    var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button>' +
+      '<button class="btn btn-primary" onclick="submitAddUser()">Simpan Akun</button>';
+
+    showModal('Tambah Akun Pengguna Baru', body, footer);
+  });
+}
+
+function onAddUserRoleChanged() {
+  var role = document.getElementById('addUserRole').value;
+  var grpE = document.getElementById('groupAddUserEkskul');
+  var grpK = document.getElementById('groupAddUserKelas');
+  if (role === 'pelatih') {
+    grpE.style.display = 'block';
+    grpK.style.display = 'none';
+  } else if (role === 'walikelas') {
+    grpE.style.display = 'none';
+    grpK.style.display = 'block';
+  } else {
+    grpE.style.display = 'none';
+    grpK.style.display = 'none';
+  }
+}
+
+function submitAddUser() {
+  var name = (document.getElementById('addUserName').value || '').trim();
+  var u = (document.getElementById('addUserUsername').value || '').trim().toLowerCase();
+  var p = (document.getElementById('addUserPassword').value || '').trim();
+  var role = document.getElementById('addUserRole').value;
+  var eid = (role === 'pelatih') ? document.getElementById('addUserEkskul').value : '';
+  var kid = (role === 'walikelas') ? document.getElementById('addUserKelas').value : '';
+
+  if (!name || !u || !p) {
+    alert('Nama Lengkap, Username, dan Password wajib diisi!');
+    return;
+  }
+
+  callApi('addUser', [{
+    username: u,
+    password: p,
+    name: name,
+    role: role,
+    ekskulId: eid,
+    kelasId: kid,
+    siswaId: ''
+  }], function(res){
+    if (res && res.success) {
+      closeModal();
+      showToast('Akun ' + u + ' berhasil ditambahkan!', 'success');
+      renderManajemenUser();
+    } else {
+      showToast('⚠️ Gagal menambahkan akun', 'danger');
+    }
+  });
+}
+
+function showEditUserModal(userId) {
+  callApi('getAllData', [], function(data){
+    var users = data.users || [];
+    var u = users.find(function(x){ return x.id === userId; });
+    if (!u) { alert('Pengguna tidak ditemukan!'); return; }
+
+    var ekskul = data.ekskul || [];
+    var kelas = data.kelas || [];
+
+    var body = '' +
+      '<div class="form-group">' +
+        '<label class="form-label">Nama Lengkap</label>' +
+        '<input type="text" id="editUserName" class="form-control" value="' + escapeHtml(u.name) + '">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Username Login</label>' +
+        '<input type="text" id="editUserUsername" class="form-control" value="' + escapeHtml(u.username) + '">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Peran Pengguna (Role)</label>' +
+        '<select id="editUserRole" class="form-control" onchange="onEditUserRoleChanged()">' +
+          '<option value="pelatih"' + (u.role === 'pelatih' ? ' selected' : '') + '>Pelatih Ekskul</option>' +
+          '<option value="walikelas"' + (u.role === 'walikelas' ? ' selected' : '') + '>Wali Kelas</option>' +
+          '<option value="admin"' + (u.role === 'admin' ? ' selected' : '') + '>Administrator</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="form-group" id="groupEditUserEkskul" style="' + (u.role === 'pelatih' ? '' : 'display:none;') + '">' +
+        '<label class="form-label">Cabang Ekskul yang Diampu</label>' +
+        '<select id="editUserEkskul" class="form-control">' +
+          '<option value="">(Universal / Koordinator Seluruh Ekskul)</option>' +
+          ekskul.map(function(e){
+            var sel = (u.ekskulId === e.id) ? ' selected' : '';
+            return '<option value="' + e.id + '"' + sel + '>' + e.name + '</option>';
+          }).join('') +
+        '</select>' +
+      '</div>' +
+      '<div class="form-group" id="groupEditUserKelas" style="' + (u.role === 'walikelas' ? '' : 'display:none;') + '">' +
+        '<label class="form-label">Rombel / Kelas Binaan</label>' +
+        '<select id="editUserKelas" class="form-control">' +
+          '<option value="">(Universal / Koordinator Seluruh Kelas)</option>' +
+          kelas.map(function(k){
+            var sel = (u.kelasId === k.id) ? ' selected' : '';
+            return '<option value="' + k.id + '"' + sel + '>' + k.name + '</option>';
+          }).join('') +
+        '</select>' +
+      '</div>';
+
+    var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button>' +
+      '<button class="btn btn-primary" onclick="submitEditUser(\'' + u.id + '\')">Simpan Perubahan</button>';
+
+    showModal('Edit Akun — ' + u.name, body, footer);
+  });
+}
+
+function onEditUserRoleChanged() {
+  var role = document.getElementById('editUserRole').value;
+  var grpE = document.getElementById('groupEditUserEkskul');
+  var grpK = document.getElementById('groupEditUserKelas');
+  if (role === 'pelatih') {
+    grpE.style.display = 'block';
+    grpK.style.display = 'none';
+  } else if (role === 'walikelas') {
+    grpE.style.display = 'none';
+    grpK.style.display = 'block';
+  } else {
+    grpE.style.display = 'none';
+    grpK.style.display = 'none';
+  }
+}
+
+function submitEditUser(userId) {
+  var name = (document.getElementById('editUserName').value || '').trim();
+  var u = (document.getElementById('editUserUsername').value || '').trim().toLowerCase();
+  var role = document.getElementById('editUserRole').value;
+  var eid = (role === 'pelatih') ? document.getElementById('editUserEkskul').value : '';
+  var kid = (role === 'walikelas') ? document.getElementById('editUserKelas').value : '';
+
+  if (!name || !u) {
+    alert('Nama dan Username tidak boleh kosong!');
+    return;
+  }
+
+  callApi('updateUser', [{
+    id: userId,
+    name: name,
+    username: u,
+    role: role,
+    ekskulId: eid,
+    kelasId: kid
+  }], function(res){
+    if (res && res.success) {
+      closeModal();
+      showToast('Perubahan akun berhasil disimpan!', 'success');
+      renderManajemenUser();
+    } else {
+      showToast('⚠️ Gagal memperbarui akun', 'danger');
+    }
+  });
+}
+
+function showChangePasswordModal(userId, username, name) {
+  var body = '' +
+    '<div style="font-size:12px;margin-bottom:12px;">Reset atau perbarui password untuk akun <b>' + name + '</b> (<code>' + username + '</code>):</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Password Baru <span style="color:var(--danger)">*</span></label>' +
+      '<input type="text" id="modalNewPassword" class="form-control" placeholder="Masukkan password baru">' +
+    '</div>' +
+    '<div style="font-size:11px;color:var(--gray-500);margin-top:4px;">💡 Saran: gunakan password sederhana (misal: 123) atau kombinasikan angka/huruf yang mudah diingat.</div>';
+
+  var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button>' +
+    '<button class="btn btn-primary" onclick="submitChangePassword(\'' + userId + '\',\'' + username + '\')">Simpan Password</button>';
+
+  showModal('Ganti Password Akun', body, footer);
+}
+
+function submitChangePassword(userId, username) {
+  var newPass = (document.getElementById('modalNewPassword').value || '').trim();
+  if (!newPass) {
+    alert('Password baru tidak boleh kosong!');
+    return;
+  }
+
+  callApi('changeUserPassword', [userId, newPass], function(res){
+    if (res && res.success) {
+      closeModal();
+      showToast('Password untuk ' + username + ' berhasil diubah!', 'success');
+      renderManajemenUser();
+    } else {
+      showToast('⚠️ Gagal mengubah password', 'danger');
+    }
+  });
+}
+
+function deleteUserAction(userId, username, role) {
+  if (username === 'admin') {
+    alert('Akun administrator utama tidak dapat dihapus.');
+    return;
+  }
+  if (!confirm('Apakah Anda yakin ingin menghapus akun ' + username + ' (' + role + ')? Pengguna tidak akan dapat login lagi.')) return;
+
+  callApi('removeUser', [userId], function(res){
+    if (res && res.success) {
+      showToast('Akun ' + username + ' dihapus.', 'success');
+      renderManajemenUser();
+    } else {
+      showToast('⚠️ Gagal menghapus akun', 'danger');
+    }
+  });
+}
+
+// ============================================================
+// 5. INPUT ABSENSI (PELATIH & ADMIN) — HANYA PESERTA TERDAFTAR
+// ============================================================
+function renderInputAbsensi(targetEkskulId) {
+  var isCoachBound = (CU.role === 'pelatih' && CU.ekskulId);
+  var selectedEkskulId = targetEkskulId || (isCoachBound ? CU.ekskulId : '');
+  setHeader('Input Ketidakhadiran Siswa', 'Hanya peserta terdaftar yang tampil. Default semua siswa = Hadir.');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat formulir absensi...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allEkskul = data.ekskul || [];
+    var allKelas = data.kelas || [];
+    var today = new Date().toISOString().split('T')[0];
+    if (!selectedEkskulId && allEkskul.length > 0) selectedEkskulId = allEkskul[0].id;
+
+    var html = '' +
+      '<div class="card" style="margin-bottom:14px;">' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Cabang Ekstrakurikuler ' + (isCoachBound ? '<span class="badge badge-info" style="font-size:10px;margin-left:4px;">🔒 Terkunci (Tugas Anda)</span>' : '') + '</label>' +
+            '<select id="absenEkskul" class="form-control" onchange="loadDaftarPesertaAbsen()"' + (isCoachBound ? ' disabled' : '') + '>' +
+              allEkskul.map(function(e){
+                var sel = (selectedEkskulId === e.id) ? ' selected' : '';
+                return '<option value="' + e.id + '"' + sel + '>' + e.name + ' (' + e.hari + ')</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Tanggal Latihan</label>' +
+            '<input type="date" id="absenTanggal" class="form-control" value="' + today + '" onchange="loadDaftarPesertaAbsen()">' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Filter Kelas Siswa</label>' +
+            '<select id="absenKelasFilter" class="form-control" onchange="loadDaftarPesertaAbsen()">' +
+              '<option value="">Semua Kelas (7A - 9B)</option>' +
+              allKelas.map(function(k){ return '<option value="' + k.id + '">' + k.name + '</option>'; }).join('') +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // PENCARIAN & ACTION BAR
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap;">' +
+        '<input type="text" id="absenSearch" class="form-control" placeholder="🔍 Cari nama peserta..." oninput="filterPesertaAbsenList()" style="max-width:280px;">' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="btn btn-sm btn-outline" onclick="markAllHadir()">Tandai Semua Hadir</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div id="pesertaAbsenArea"></div>';
+
+    ca.innerHTML = html;
+    loadDaftarPesertaAbsen();
+  });
+}
+
+function loadDaftarPesertaAbsen() {
+  var elEkskul = document.getElementById('absenEkskul');
+  var eid = (elEkskul ? elEkskul.value : '') || (CU.role === 'pelatih' && CU.ekskulId ? CU.ekskulId : '');
+  var tgl = document.getElementById('absenTanggal').value;
+  var kid = document.getElementById('absenKelasFilter').value;
+  var area = document.getElementById('pesertaAbsenArea');
+
+  // Bersihkan sticky save bar sebelumnya
+  var oldBar = document.getElementById('appStickyBar');
+  if (oldBar) oldBar.remove();
+
+  area.innerHTML = '<div class="text-center" style="padding:30px;">⏳ Memuat daftar peserta terdaftar...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allReg = data.keikutsertaan || [];
+    var allSiswa = data.siswa || [];
+    var allKelas = data.kelas || [];
+    var eObj = (data.ekskul || []).find(function(x){ return x.id === eid; });
+
+    // FILTER HANYA PESERTA TERDAFTAR DI EKSKUL INI!
+    var regSids = allReg.filter(function(r){ return r.ekskulId === eid; }).map(function(r){ return r.siswaId; });
+    var enrolledStudents = allSiswa.filter(function(s){ return regSids.indexOf(s.id) >= 0; });
+
+    if (kid) {
+      enrolledStudents = enrolledStudents.filter(function(s){ return s.kelasId === kid; });
+    }
+
+    var kMap = {}; allKelas.forEach(function(k){ kMap[k.id] = k.name; });
+
+    callApi('getSessionAbsensi', [eid, tgl], function(savedAbs) {
+      var savedMap = {};
+      (savedAbs || []).forEach(function(a){ savedMap[a.siswaId] = a; });
+
+      if (enrolledStudents.length === 0) {
+        area.innerHTML = '<div class="card text-center" style="padding:40px 20px;">' +
+          '<div style="font-size:36px;margin-bottom:8px;">⚠️</div>' +
+          '<h4>Belum Ada Peserta yang Terdaftar</h4>' +
+          '<p class="text-muted" style="margin:4px 0 12px;font-size:12px;">' +
+            'Tidak ada siswa yang terdaftar di ekstrakurikuler <b>' + (eObj ? eObj.name : eid) + '</b>' + (kid ? ' untuk kelas yang dipilih.' : '.') +
+          '</p>' +
+          (CU.role === 'admin' ? '<button class="btn btn-primary btn-sm" onclick="goTo(\'keikutsertaan\')">👥 Buka Menu Kelola Peserta</button>' : '') +
+        '</div>';
+        return;
+      }
+
+      var html = '<div style="margin-bottom:80px;">' +
+        '<div style="font-size:12px;color:var(--gray-600);margin-bottom:10px;">' +
+          '👥 Menampilkan <b>' + enrolledStudents.length + ' peserta terdaftar</b> di ' + (eObj ? eObj.name : '') + '.' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:8px;">';
+
+      enrolledStudents.forEach(function(s) {
+        var existing = savedMap[s.id];
+        var curStatus = existing ? existing.status : 'hadir';
+        var curKet = existing ? (existing.keterangan || '') : '';
+
+        html += '<div class="card absen-student-card" data-sid="' + s.id + '" data-text="' + (s.nama + ' ' + s.nis).toLowerCase() + '" style="margin-bottom:0;padding:12px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+            '<div>' +
+              '<div style="font-weight:700;font-size:14px;">' + s.nama + '</div>' +
+              '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">NIS: ' + s.nis + ' • Kelas: <span class="badge badge-gray">' + (kMap[s.kelasId] || s.kelasId) + '</span></div>' +
+            '</div>' +
+            '<div class="status-group" data-sid="' + s.id + '">' +
+              '<button type="button" class="status-btn ' + (curStatus === 'hadir' ? 'selected-hadir' : '') + '" onclick="selectAbsenStatus(\'' + s.id + '\', \'hadir\')">Hadir</button>' +
+              '<button type="button" class="status-btn ' + (curStatus === 'sakit' ? 'selected-sakit' : '') + '" onclick="selectAbsenStatus(\'' + s.id + '\', \'sakit\')">Sakit</button>' +
+              '<button type="button" class="status-btn ' + (curStatus === 'izin' ? 'selected-izin' : '') + '" onclick="selectAbsenStatus(\'' + s.id + '\', \'izin\')">Izin</button>' +
+              '<button type="button" class="status-btn ' + (curStatus === 'alpha' ? 'selected-alpha' : '') + '" onclick="selectAbsenStatus(\'' + s.id + '\', \'alpha\')">Alpha</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="ket-box" id="ketBox_' + s.id + '" style="margin-top:8px;' + (curStatus === 'hadir' ? 'display:none;' : 'display:block;') + '">' +
+            '<input type="text" class="form-control" id="ketInput_' + s.id + '" placeholder="Keterangan izin/sakit/alpha..." value="' + curKet + '" style="font-size:12px;padding:6px 10px;">' +
+          '</div>' +
+        '</div>';
+      });
+
+      html += '</div></div>';
+      area.innerHTML = html;
+
+      // Render Sticky Save Bar
+      renderStickySaveBar();
+      updateAbsentCounter();
+    });
+  });
+}
+
+function selectAbsenStatus(sid, status) {
+  var grp = document.querySelector('.status-group[data-sid="' + sid + '"]');
+  if (!grp) return;
+  grp.querySelectorAll('.status-btn').forEach(function(b){
+    b.className = 'status-btn';
+  });
+  var targetBtn = grp.querySelector('.status-btn:nth-child(' + (status === 'hadir' ? 1 : status === 'sakit' ? 2 : status === 'izin' ? 3 : 4) + ')');
+  if (targetBtn) targetBtn.classList.add('selected-' + status);
+
+  var ketBox = document.getElementById('ketBox_' + sid);
+  if (ketBox) ketBox.style.display = (status === 'hadir') ? 'none' : 'block';
+
+  updateAbsentCounter();
+}
+
+function markAllHadir() {
+  document.querySelectorAll('.absen-student-card').forEach(function(card){
+    var sid = card.getAttribute('data-sid');
+    selectAbsenStatus(sid, 'hadir');
+  });
+  showToast('Semua siswa ditandai Hadir.', 'info');
+}
+
+function filterPesertaAbsenList() {
+  var q = (document.getElementById('absenSearch').value || '').toLowerCase();
+  document.querySelectorAll('.absen-student-card').forEach(function(el){
+    var text = el.getAttribute('data-text') || '';
+    el.style.display = (text.indexOf(q) >= 0) ? 'block' : 'none';
+  });
+}
+
+function updateAbsentCounter() {
+  var totalAbsent = 0;
+  document.querySelectorAll('.status-group').forEach(function(grp){
+    var sel = grp.querySelector('.selected-sakit, .selected-izin, .selected-alpha');
+    if (sel) totalAbsent++;
+  });
+  var badge = document.getElementById('stickyAbsentCount');
+  if (badge) badge.textContent = totalAbsent + ' Siswa Tidak Hadir';
+}
+
+function renderStickySaveBar() {
+  var existing = document.getElementById('appStickyBar');
+  if (existing) existing.remove();
+
+  if (!CU || document.getElementById('appLayout').style.display === 'none') return;
+
+  var bar = document.createElement('div');
+  bar.id = 'appStickyBar';
+  bar.className = 'sticky-save-bar';
+  bar.innerHTML = '' +
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<span class="badge badge-danger" id="stickyAbsentCount" style="padding:6px 12px;font-size:12px;">0 Siswa Tidak Hadir</span>' +
+    '</div>' +
+    '<div>' +
+      '<button class="btn btn-primary btn-lg" onclick="saveAbsensiAction()">💾 Simpan Absensi</button>' +
+    '</div>';
+
+  var appContainer = document.getElementById('appLayout');
+  if (appContainer) appContainer.appendChild(bar);
+  else document.body.appendChild(bar);
+}
+
+function saveAbsensiAction() {
+  var elEkskul = document.getElementById('absenEkskul');
+  var eid = (elEkskul ? elEkskul.value : '') || (CU.role === 'pelatih' && CU.ekskulId ? CU.ekskulId : '');
+  var tgl = document.getElementById('absenTanggal').value;
+  var absenList = [];
+
+  document.querySelectorAll('.absen-student-card').forEach(function(card){
+    var sid = card.getAttribute('data-sid');
+    var grp = card.querySelector('.status-group');
+    var status = 'hadir';
+    if (grp.querySelector('.selected-sakit')) status = 'sakit';
+    else if (grp.querySelector('.selected-izin')) status = 'izin';
+    else if (grp.querySelector('.selected-alpha')) status = 'alpha';
+
+    var ketInput = document.getElementById('ketInput_' + sid);
+    var ket = ketInput ? ketInput.value.trim() : '';
+
+    absenList.push({ siswaId: sid, status: status, keterangan: ket });
+  });
+
+  callApi('saveAbsensi', [eid, tgl, absenList], function(res){
+    if (res && res.success) {
+      showToast('✅ Absensi berhasil disimpan!', 'success');
+      loadDaftarPesertaAbsen();
+    } else {
+      showToast('⚠️ Gagal menyimpan absensi', 'danger');
+    }
+  });
+}
+
+// ============================================================
+// 6. LAPORAN & REKAP KETIDAKHADIRAN WALI KELAS (DENGAN RINCIAN PER EKSKUL)
+// ============================================================
+function renderLaporanKelas(targetKelasId) {
+  var isWaliBound = (CU.role === 'walikelas' && CU.kelasId);
+  var selectedKelasId = targetKelasId || (isWaliBound ? CU.kelasId : '');
+  setHeader('Rekap Ketidakhadiran Siswa', 'Rincian akumulasi ketidakhadiran per siswa dan per cabang ekskul');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat laporan wali kelas...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allKelas = data.kelas || [];
+    var allEkskul = data.ekskul || [];
+
+    var html = '' +
+      '<div class="card" style="margin-bottom:14px;">' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;">' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Pilih Kelas ' + (isWaliBound ? '<span class="badge badge-info" style="font-size:10px;margin-left:4px;">🔒 Kelas Binaan</span>' : '') + '</label>' +
+            '<select id="lapKelas" class="form-control" onchange="loadLaporanTable()"' + (isWaliBound ? ' disabled' : '') + '>' +
+              (!isWaliBound ? '<option value="">Semua Kelas</option>' : '') +
+              allKelas.map(function(k){
+                var sel = (selectedKelasId === k.id) ? ' selected' : '';
+                return '<option value="' + k.id + '"' + sel + '>' + k.name + '</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Filter Ekskul</label>' +
+            '<select id="lapEkskul" class="form-control" onchange="loadLaporanTable()">' +
+              '<option value="">Semua Ekskul</option>' +
+              allEkskul.map(function(e){ return '<option value="' + e.id + '">' + e.name + '</option>'; }).join('') +
+            '</select>' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Dari Tanggal</label>' +
+            '<input type="date" id="lapDari" class="form-control" onchange="loadLaporanTable()">' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:0;">' +
+            '<label class="form-label">Sampai Tanggal</label>' +
+            '<input type="date" id="lapSampai" class="form-control" onchange="loadLaporanTable()">' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div id="lapTableArea"></div>';
+
+    ca.innerHTML = html;
+    loadLaporanTable();
+  });
+}
+
+function loadLaporanTable() {
+  var elKelas = document.getElementById('lapKelas');
+  var kid = (elKelas ? elKelas.value : '') || (CU.role === 'walikelas' && CU.kelasId ? CU.kelasId : '');
+  var eid = document.getElementById('lapEkskul').value;
+  var dari = document.getElementById('lapDari').value;
+  var sampai = document.getElementById('lapSampai').value;
+  var area = document.getElementById('lapTableArea');
+
+  area.innerHTML = '<div class="text-center" style="padding:30px;">⏳ Memuat tabel rekapitulasi...</div>';
+
+  callApi('getLaporanKelas', [kid, eid, dari, sampai], function(res) {
+    var rekap = res.rekap || [];
+    var ekskulTotals = res.ekskulTotals || [];
+
+    var html = '';
+
+    // KARTU AKUMULASI PER CABANG EKSKUL
+    if (ekskulTotals.length > 0) {
+      html += '<div class="card" style="background:var(--primary-light);border-color:var(--primary-subtle);margin-bottom:14px;">' +
+        '<div style="font-weight:700;font-size:12px;color:var(--primary-dark);margin-bottom:8px;">📊 AKUMULASI KETIDAKHADIRAN PER CABANG EKSKUL:</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+      ekskulTotals.forEach(function(et){
+        html += '<span class="badge badge-primary" style="font-size:12px;padding:5px 12px;">⚽ ' + et.name + ': <b>' + et.total + ' Absen</b></span>';
+      });
+      html += '</div></div>';
+    }
+
+    html += '<div class="card">' +
+      '<div class="card-header">' +
+        '<h3 class="card-title">Daftar Rekap Siswa</h3>' +
+        '<button class="btn btn-sm btn-outline" onclick="goTo(\'unduh\')">⬇️ Unduh CSV</button>' +
+      '</div>';
+
+    if (rekap.length === 0) {
+      html += '<p class="text-muted text-center" style="padding:24px;">Tidak ada data siswa atau catatan ketidakhadiran.</p>';
+    } else {
+      html += '<div class="table-wrap"><table>' +
+        '<thead><tr>' +
+          '<th style="width:40px;">No</th><th>NIS</th><th>Nama Siswa</th><th style="width:50px;">S</th><th style="width:50px;">I</th><th style="width:50px;">A</th><th style="width:70px;">Total</th><th>Ketidakhadiran di Ekstranya</th><th style="width:60px;text-align:center;">Detail</th>' +
+        '</tr></thead><tbody>';
+
+      rekap.forEach(function(r, idx) {
+        var s = r.siswa;
+        var perEkskulBadges = (r.perEkskul || []).map(function(pe){
+          return '<span class="badge badge-warning" style="margin-right:4px;margin-bottom:2px;">⚽ ' + pe.name + ': ' + pe.total + 'x (' + pe.sakit + 'S, ' + pe.izin + 'I, ' + pe.alpha + 'A)</span>';
+        }).join('');
+        if (!perEkskulBadges) perEkskulBadges = '<span class="badge badge-success">✅ Hadir Penuh (0 Absen)</span>';
+
+        html += '<tr>' +
+          '<td>' + (idx + 1) + '</td>' +
+          '<td><b>' + s.nis + '</b></td>' +
+          '<td>' + s.nama + '</td>' +
+          '<td style="color:var(--warning);font-weight:600;">' + r.sakit + '</td>' +
+          '<td style="color:var(--info);font-weight:600;">' + r.izin + '</td>' +
+          '<td style="color:var(--danger);font-weight:600;">' + r.alpha + '</td>' +
+          '<td><span class="badge ' + (r.total > 0 ? 'badge-danger' : 'badge-gray') + '">' + r.total + ' Absen</span></td>' +
+          '<td>' + perEkskulBadges + '</td>' +
+          '<td style="text-align:center;">' +
+            '<button class="btn btn-sm btn-outline" style="padding:2px 8px;" onclick="showDetailSiswaModal(\'' + s.id + '\',\'' + s.nama + '\')">🔍</button>' +
+          '</td>' +
+        '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+    }
+
+    html += '</div>';
+    area.innerHTML = html;
+  });
+}
+
+function showDetailSiswaModal(sid, sName) {
+  callApi('getRekapPresensiSiswa', [sid], function(res){
+    if (!res || !res.success) {
+      alert('Gagal memuat rincian siswa.');
+      return;
+    }
+    var pe = res.perEkskul || [];
+    var rw = res.riwayat || [];
+
+    var body = '<div style="font-size:12px;">' +
+      '<div style="margin-bottom:12px;padding:10px;background:var(--gray-50);border-radius:var(--radius-sm);">' +
+        '<b>📊 Jumlah Ketidakhadiran di Ekstranya:</b><br>' +
+        '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">';
+
+    if (pe.length === 0) {
+      body += '<span class="text-muted">Tidak ada riwayat ketidakhadiran.</span>';
+    } else {
+      pe.forEach(function(e){
+        body += '<span class="badge badge-warning">⚽ ' + e.ekskulName + ': ' + e.totalAbsen + 'x Absen</span>';
+      });
+    }
+
+    body += '</div></div>' +
+      '<b>Rincian Tanggal Transaksi:</b>' +
+      '<div style="max-height:240px;overflow-y:auto;margin-top:6px;">';
+
+    if (rw.length === 0) {
+      body += '<p class="text-muted text-center" style="padding:14px;">Hadir di seluruh sesi.</p>';
+    } else {
+      rw.forEach(function(item){
+        body += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">' +
+          '<div><b>' + item.ekskulName + '</b> <span class="text-muted">(' + item.tanggal + ')</span><br><em style="font-size:11px;">' + (item.keterangan || '-') + '</em></div>' +
+          '<span class="badge ' + (item.status === 'sakit' ? 'badge-warning' : item.status === 'izin' ? 'badge-info' : 'badge-danger') + '">' + item.status.toUpperCase() + '</span>' +
+        '</div>';
+      });
+    }
+
+    body += '</div></div>';
+    showModal('Detail Ketidakhadiran — ' + sName, body, '<button class="btn btn-primary" onclick="closeModal()">Tutup</button>');
+  });
+}
+
+// ============================================================
+// 7. RIWAYAT SESI ABSENSI (PELATIH & ADMIN)
+// ============================================================
+function renderRiwayat() {
+  setHeader('Riwayat Sesi Absensi', 'Daftar tanggal pertemuan ekstra yang telah diinput');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat riwayat sesi...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var allEkskul = data.ekskul || [];
+    callApi('getSesiByEkskul', [], function(sesiList) {
+      var eMap = {}; allEkskul.forEach(function(e){ eMap[e.id] = e.name; });
+
+      var html = '<div class="card">' +
+        '<div class="card-header"><h3 class="card-title">Sesi Absensi Tersimpan</h3></div>';
+
+      if (!sesiList || sesiList.length === 0) {
+        html += '<p class="text-muted text-center" style="padding:24px;">Belum ada sesi absensi yang tercatat.</p>';
+      } else {
+        html += '<div class="table-wrap"><table>' +
+          '<thead><tr>' +
+            '<th>No</th><th>Tanggal</th><th>Ekskul</th><th>Sakit</th><th>Izin</th><th>Alpha</th><th>Total Absen</th><th style="width:80px;text-align:center;">Aksi</th>' +
+          '</tr></thead><tbody>';
+
+        sesiList.forEach(function(s, idx) {
+          html += '<tr>' +
+            '<td>' + (idx + 1) + '</td>' +
+            '<td><b>' + s.tanggal + '</b></td>' +
+            '<td>' + (eMap[s.ekskulId] || s.ekskulId) + '</td>' +
+            '<td style="color:var(--warning);">' + s.sakit + '</td>' +
+            '<td style="color:var(--info);">' + s.izin + '</td>' +
+            '<td style="color:var(--danger);">' + s.alpha + '</td>' +
+            '<td><span class="badge badge-danger">' + s.total + ' Siswa</span></td>' +
+            '<td style="text-align:center;">' +
+              '<button class="btn btn-sm btn-outline btn-danger" style="padding:2px 8px;" onclick="hapusSesiAction(\'' + s.ekskulId + '\',\'' + s.tanggal + '\')">Hapus</button>' +
+            '</td>' +
+          '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+      }
+
+      html += '</div>';
+      ca.innerHTML = html;
+    });
+  });
+}
+
+function hapusSesiAction(eid, tgl) {
+  if (!confirm('Hapus seluruh data absensi sesi tanggal ' + tgl + '?')) return;
+  callApi('deleteSession', [eid, tgl], function(res){
+    if (res && res.success) {
+      showToast('Sesi absensi dihapus.', 'success');
+      renderRiwayat();
+    }
+  });
+}
+
+// ============================================================
+// 8. DATA SISWA, EKSKUL & UNDUH LAPORAN
+// ============================================================
+function renderSiswa() {
+  setHeader('Data Peserta Didik (Kelas 7, 8, 9)', 'Admin tidak perlu mendata pilihan ekskul per siswa');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat data siswa...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var siswa = data.siswa || [];
+    var kelas = data.kelas || [];
+    var kMap = {}; kelas.forEach(function(k){ kMap[k.id] = k.name; });
+
+    var html = '<div class="card">' +
+      '<div class="card-header">' +
+        '<h3 class="card-title">Daftar Siswa (' + siswa.length + ')</h3>' +
+        '<button class="btn btn-sm btn-primary" onclick="showAddSiswaModal()">➕ Tambah Siswa</button>' +
+      '</div>' +
+      '<div class="table-wrap"><table>' +
+        '<thead><tr><th>No</th><th>NIS</th><th>Nama Lengkap</th><th>Kelas</th><th style="width:80px;text-align:center;">Aksi</th></tr></thead><tbody>';
+
+    siswa.forEach(function(s, idx) {
+      html += '<tr>' +
+        '<td>' + (idx + 1) + '</td>' +
+        '<td><b>' + s.nis + '</b></td>' +
+        '<td>' + s.nama + '</td>' +
+        '<td><span class="badge badge-gray">' + (kMap[s.kelasId] || s.kelasId) + '</span></td>' +
+        '<td style="text-align:center;">' +
+          '<button class="btn btn-sm btn-outline btn-danger" style="padding:2px 8px;" onclick="hapusSiswaAction(\'' + s.id + '\',\'' + s.nama + '\')">✕</button>' +
+        '</td>' +
+      '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+    ca.innerHTML = html;
+  });
+}
+
+function showAddSiswaModal() {
+  callApi('getAllData', [], function(data){
+    var kelas = data.kelas || [];
+    var body = '<div class="form-group"><label class="form-label">NIS</label><input type="text" id="addNis" class="form-control" placeholder="2024001"></div>' +
+      '<div class="form-group"><label class="form-label">Nama Siswa</label><input type="text" id="addNama" class="form-control" placeholder="Nama Lengkap"></div>' +
+      '<div class="form-group"><label class="form-label">Kelas</label><select id="addKelas" class="form-control">' +
+        kelas.map(function(k){ return '<option value="' + k.id + '">' + k.name + '</option>'; }).join('') +
+      '</select></div>';
+    var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="submitAddSiswa()">Simpan</button>';
+    showModal('Tambah Siswa', body, footer);
+  });
+}
+
+function submitAddSiswa() {
+  var nis = document.getElementById('addNis').value.trim();
+  var nama = document.getElementById('addNama').value.trim();
+  var kid = document.getElementById('addKelas').value;
+  if (!nis || !nama) { alert('Harap isi NIS dan Nama!'); return; }
+  callApi('addSiswa', [{ nis: nis, nama: nama, kelasId: kid }], function(res){
+    if (res && res.success) { closeModal(); showToast('Siswa ditambahkan!', 'success'); renderSiswa(); }
+  });
+}
+
+function hapusSiswaAction(id, name) {
+  if (!confirm('Hapus siswa ' + name + '? Seluruh riwayat presensi siswa ini akan dihapus.')) return;
+  callApi('removeSiswa', [id], function(res){
+    if (res && res.success) { showToast('Siswa dihapus.', 'success'); renderSiswa(); }
+  });
+}
+
+function renderEkskul() {
+  setHeader('Data Cabang Ekstrakurikuler', 'Kelola jadwal, kuota, dan status pendaftaran');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat data ekskul...</div>';
+
+  callApi('getAllData', [], function(data) {
+    var ekskul = data.ekskul || [];
+    var html = '<div class="card">' +
+      '<div class="card-header">' +
+        '<h3 class="card-title">Daftar Ekstrakurikuler (' + ekskul.length + ')</h3>' +
+        '<button class="btn btn-sm btn-primary" onclick="showAddEkskulModal()">➕ Tambah Ekskul</button>' +
+      '</div>' +
+      '<div class="table-wrap"><table>' +
+        '<thead><tr><th>No</th><th>Nama Ekskul</th><th>Hari & Jam</th><th>Status Pendaftaran</th><th style="width:100px;text-align:center;">Aksi</th></tr></thead><tbody>';
+
+    ekskul.forEach(function(e, idx) {
+      var isOpen = (e.isBuka || 'BUKA').toUpperCase() === 'BUKA';
+      html += '<tr>' +
+        '<td>' + (idx + 1) + '</td>' +
+        '<td><b>' + e.name + '</b></td>' +
+        '<td>' + e.hari + ', ' + e.jam + '</td>' +
+        '<td>' + (isOpen ? '<span class="badge badge-success">🟢 BUKA</span>' : '<span class="badge badge-danger">🔴 TUTUP</span>') + '</td>' +
+        '<td style="text-align:center;">' +
+          '<button class="btn btn-sm btn-outline ' + (isOpen ? 'btn-danger' : 'btn-success') + '" style="padding:2px 8px;font-size:11px;" onclick="toggleEkskulBukaStatus(\'' + e.id + '\',\'' + (isOpen ? 'BUKA' : 'TUTUP') + '\')">' + (isOpen ? 'Tutup' : 'Buka') + '</button>' +
+        '</td>' +
+      '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+    ca.innerHTML = html;
+  });
+}
+
+function showAddEkskulModal() {
+  var body = '<div class="form-group"><label class="form-label">Nama Ekskul</label><input type="text" id="addEName" class="form-control" placeholder="Contoh: Robotik"></div>' +
+    '<div class="form-group"><label class="form-label">Hari Latihan</label><input type="text" id="addEHari" class="form-control" placeholder="Contoh: Sabtu"></div>' +
+    '<div class="form-group"><label class="form-label">Jam Latihan</label><input type="text" id="addEJam" class="form-control" placeholder="Contoh: 09:00 - 11:00"></div>';
+  var footer = '<button class="btn btn-outline" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="submitAddEkskul()">Simpan</button>';
+  showModal('Tambah Ekskul', body, footer);
+}
+
+function submitAddEkskul() {
+  var name = document.getElementById('addEName').value.trim();
+  var hari = document.getElementById('addEHari').value.trim();
+  var jam = document.getElementById('addEJam').value.trim();
+  if (!name) { alert('Nama ekskul wajib diisi!'); return; }
+  callApi('addEkskul', [{ name: name, hari: hari, jam: jam, isBuka: 'BUKA' }], function(res){
+    if (res && res.success) { closeModal(); showToast('Ekskul ditambahkan!', 'success'); renderEkskul(); }
+  });
+}
+
+function renderUnduh() {
+  setHeader('Unduh Laporan (CSV)', 'File kompatibel dengan Microsoft Excel & Google Sheets');
+  var ca = document.getElementById('contentArea');
+  var html = '<div class="card">' +
+    '<div class="card-header"><h3 class="card-title">Pilihan Ekspor CSV</h3></div>' +
+    '<div style="display:flex;flex-direction:column;gap:12px;">' +
+      '<div style="padding:14px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<h4 style="font-size:14px;">📊 Rekap Ketidakhadiran per Kelas</h4>' +
+          '<p class="text-muted" style="font-size:12px;">Menyertakan rincian ketidakhadiran per cabang ekskul untuk setiap siswa.</p>' +
+        '</div>' +
+        '<button class="btn btn-primary" onclick="downloadCsvAction(\'kelas\')">⬇️ Unduh CSV Rekap</button>' +
+      '</div>' +
+      '<div style="padding:14px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<h4 style="font-size:14px;">📑 Detail Log Ketidakhadiran</h4>' +
+          '<p class="text-muted" style="font-size:12px;">Riwayat lengkap transaksi ketidakhadiran per tanggal dan alasan.</p>' +
+        '</div>' +
+        '<button class="btn btn-outline" onclick="downloadCsvAction(\'ekskul\')">⬇️ Unduh CSV Detail</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  ca.innerHTML = html;
+}
+
+function downloadCsvAction(type) {
+  showToast('Memproses file unduhan...', 'info');
+  var fn = (type === 'kelas') ? 'exportCsvKelas' : 'exportCsvEkskul';
+  callApi(fn, [], function(csvContent) {
+    if (!csvContent) {
+      alert('Gagal menghasilkan file CSV.');
+      return;
+    }
+    // Unduh dengan BOM UTF-8 agar karakter rapi di Excel
+    var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Laporan_' + (type === 'kelas' ? 'Rekap_Kelas' : 'Detail_Absensi') + '_' + new Date().toISOString().split('T')[0] + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('File CSV berhasil diunduh!', 'success');
+  });
+}
+
+function renderDashboard() {
+  if (!CU) return;
+  if (CU.role === 'pelatih') {
+    renderDashboardPelatih();
+  } else if (CU.role === 'walikelas') {
+    renderDashboardWalikelas();
+  } else if (CU.role === 'siswa') {
+    renderDashboardSiswa();
+  } else {
+    renderDashboardAdmin();
+  }
+}
+
+// ============================================================
+// DASHBOARD KHUSUS ADMINISTRATOR
+// ============================================================
+function renderDashboardAdmin() {
+  setHeader('Dashboard Administrator', 'Pusat kendali master data, pendaftaran, dan sistem presensi');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat dashboard admin...</div>';
+
+  callApi('getAllData', [], function(data){
+    if (data && data.appConfig) {
+      saveLogoConfig(data.appConfig, true);
+    }
+    var jmlSiswa = (data.siswa || []).length;
+    var jmlEkskul = (data.ekskul || []).length;
+    var jmlReg = (data.keikutsertaan || []).length;
+    var jmlAbs = (data.absensi || []).length;
+
+    var html = '' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:16px;">' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Total Siswa (7-9)</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--primary);">' + jmlSiswa + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Basis data siswa aktif</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Cabang Ekskul</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--info);">' + jmlEkskul + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Pilihan ekstrakurikuler</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Pendaftaran Ekskul</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--success);">' + jmlReg + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Keikutsertaan terdaftar</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Catatan Ketidakhadiran</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--danger);">' + jmlAbs + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Riwayat S/I/A seluruh ekskul</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card">' +
+        '<div class="card-header"><h3 class="card-title">⚡ Pintasan Administrasi & Kendali Cepat</h3></div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" onclick="goTo(\'input-absensi\')">📝 Input Ketidakhadiran</button>' +
+          '<button class="btn btn-success" onclick="goTo(\'keikutsertaan\')">👥 Kelola Peserta & Pendaftaran</button>' +
+          '<button class="btn btn-outline" onclick="goTo(\'manajemen-user\')">🔐 Kelola Akun Pengguna</button>' +
+          '<button class="btn btn-outline" onclick="showLogoConfigModal()">🎨 Ganti Logo & Identitas</button>' +
+          '<button class="btn btn-outline" onclick="goTo(\'laporan-kelas\')">📈 Lihat Rekap Wali Kelas</button>' +
+          '<button class="btn btn-outline" onclick="goTo(\'siswa\')">👨‍🎓 Master Data Siswa</button>' +
+          '<button class="btn btn-outline" onclick="goTo(\'ekskul\')">⚽ Master Cabang Ekskul</button>' +
+        '</div>' +
+      '</div>';
+
+    ca.innerHTML = html;
+  });
+}
+
+// ============================================================
+// DASHBOARD KHUSUS PELATIH EKSKUL
+// ============================================================
+function renderDashboardPelatih() {
+  setHeader('Dashboard Pelatih', 'Ringkasan jadwal latihan, kehadiran peserta, dan pintasan absensi cepat');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat dashboard pelatih...</div>';
+
+  callApi('getAllData', [], function(data) {
+    if (data && data.appConfig) saveLogoConfig(data.appConfig, true);
+
+    var allEkskul = data.ekskul || [];
+    var allReg = data.keikutsertaan || [];
+    var allAbs = data.absensi || [];
+
+    var isCoachBound = (CU.role === 'pelatih' && CU.ekskulId);
+    var myEkskul = isCoachBound ? allEkskul.find(function(x){ return x.id === CU.ekskulId; }) : null;
+
+    // Hitung peserta per ekskul
+    var regCountMap = {};
+    allReg.forEach(function(r){
+      regCountMap[r.ekskulId] = (regCountMap[r.ekskulId] || 0) + 1;
+    });
+
+    // Hitung sesi unik (ekskulId + '_' + tanggal)
+    var sesiMap = {};
+    allAbs.forEach(function(a){
+      if (isCoachBound && a.ekskulId !== CU.ekskulId) return;
+      sesiMap[a.ekskulId + '_' + a.tanggal] = {
+        ekskulId: a.ekskulId,
+        tanggal: a.tanggal
+      };
+    });
+    var jmlSesi = Object.keys(sesiMap).length;
+    var jmlPeserta = isCoachBound ? (regCountMap[CU.ekskulId] || 0) : allReg.length;
+    var relevantAbs = isCoachBound ? allAbs.filter(function(a){ return a.ekskulId === CU.ekskulId; }) : allAbs;
+    var jmlAbsen = relevantAbs.length;
+
+    // Sesi terakhir (ambil hingga 5 sesi terbaru)
+    var listSesi = [];
+    for (var k in sesiMap) {
+      var s = sesiMap[k];
+      var eObj = allEkskul.find(function(x){ return x.id === s.ekskulId; });
+      var absDiSesi = allAbs.filter(function(a){ return a.ekskulId === s.ekskulId && a.tanggal === s.tanggal; });
+      listSesi.push({
+        ekskulId: s.ekskulId,
+        ekskulName: eObj ? eObj.name : s.ekskulId,
+        tanggal: s.tanggal,
+        totalAbsen: absDiSesi.length,
+        sakit: absDiSesi.filter(function(x){ return (x.status||'').toLowerCase() === 'sakit'; }).length,
+        izin: absDiSesi.filter(function(x){ return (x.status||'').toLowerCase() === 'izin'; }).length,
+        alpha: absDiSesi.filter(function(x){ return (x.status||'').toLowerCase() === 'alpha'; }).length
+      });
+    }
+    listSesi.sort(function(a, b){ return b.tanggal.localeCompare(a.tanggal); });
+    var topSesi = listSesi.slice(0, 5);
+
+    var displayEkskuls = isCoachBound && myEkskul ? [myEkskul] : allEkskul;
+
+    var bannerSubtitle = isCoachBound && myEkskul ?
+      ('Akun Pelatih ' + escapeHtml(myEkskul.name) + ' aktif. Anda bertugas membina peserta dan menginput presensi pertemuan ' + escapeHtml(myEkskul.name) + ' (Jadwal: ' + escapeHtml(myEkskul.hari || '-') + ', ' + escapeHtml(myEkskul.jam || '-') + ').') :
+      'Akun Pelatih Universal aktif. Anda memiliki wewenang untuk mengisi absensi dan memantau kehadiran siswa di seluruh cabang ekstrakurikuler.';
+
+    var bannerBadge = isCoachBound && myEkskul ?
+      ('⚽ PORTAL PELATIH: ' + escapeHtml(myEkskul.name.toUpperCase())) :
+      '⚽ PORTAL RESMI PELATIH';
+
+    var html = '' +
+      // HERO BANNER PELATIH
+      '<div class="card" style="background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);color:#fff;border:none;margin-bottom:16px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:gap:12px;">' +
+          '<div>' +
+            '<div style="display:inline-block;padding:2px 8px;background:rgba(255,255,255,0.2);border-radius:12px;font-size:11px;font-weight:600;margin-bottom:6px;">' + bannerBadge + '</div>' +
+            '<h2 style="font-size:20px;font-weight:800;margin:0 0 4px 0;color:#fff;">Selamat Datang, ' + escapeHtml(CU.name) + '! 👋</h2>' +
+            '<p style="font-size:12px;opacity:0.9;margin:0;max-width:540px;">' + bannerSubtitle + '</p>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button class="btn" style="background:#fff;color:var(--primary);font-weight:700;border:none;" onclick="goTo(\'input-absensi\'' + (isCoachBound ? ',\'' + CU.ekskulId + '\'' : '') + ')">📝 Input Absensi ' + (isCoachBound && myEkskul ? escapeHtml(myEkskul.name) : 'Hari Ini') + '</button>' +
+            '<button class="btn" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);" onclick="goTo(\'riwayat\')">📅 Riwayat Sesi</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // 4 STATS PELATIH
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:16px;">' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">' + (isCoachBound ? 'Cabang Tugas' : 'Cabang Ekskul') + '</div>' +
+            '<span style="font-size:18px;">⚽</span>' +
+          '</div>' +
+          '<div style="font-size:' + (isCoachBound ? '20px' : '26px') + ';font-weight:800;color:var(--primary);margin-top:4px;">' + (isCoachBound && myEkskul ? escapeHtml(myEkskul.name) : allEkskul.length) + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (isCoachBound && myEkskul ? (myEkskul.hari + ' • ' + myEkskul.jam) : 'Ekskul tersedia di sekolah') + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Peserta Terdaftar</div>' +
+            '<span style="font-size:18px;">👥</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--success);margin-top:4px;">' + jmlPeserta + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (isCoachBound ? 'Siswa bergabung di ekskul ini' : 'Total siswa bergabung') + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Sesi Latihan Tercatat</div>' +
+            '<span style="font-size:18px;">📅</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--info);margin-top:4px;">' + jmlSesi + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Pertemuan telah diabsen</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Ketidakhadiran (S/I/A)</div>' +
+            '<span style="font-size:18px;">⚠️</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--danger);margin-top:4px;">' + jmlAbsen + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Catatan siswa tidak hadir</div>' +
+        '</div>' +
+      '</div>' +
+
+      // KARTU CABANG EKSKUL & ABSENSI 1-KLIK
+      '<div class="card">' +
+        '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<h3 class="card-title">' + (isCoachBound ? '⚡ Cabang Ekskul Binaan Anda' : '⚡ Pilih Cabang Ekskul untuk Absensi Cepat') + '</h3>' +
+          '<span class="badge badge-info">' + displayEkskuls.length + ' Cabang</span>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;">';
+
+    displayEkskuls.forEach(function(e) {
+      var count = regCountMap[e.id] || 0;
+      var isOpen = ((e.isBuka || 'BUKA').toUpperCase() === 'BUKA');
+      html += '<div style="border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;">' +
+        '<div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+            '<h4 style="font-size:15px;font-weight:700;margin:0;color:var(--gray-900);">' + escapeHtml(e.name) + '</h4>' +
+            '<span class="badge ' + (isOpen ? 'badge-success' : 'badge-danger') + '" style="font-size:10px;">' + (isOpen ? 'BUKA' : 'TUTUP') + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--gray-600);margin-bottom:8px;">' +
+            '<div>📅 <b>Jadwal:</b> ' + escapeHtml(e.hari || '-') + ' (' + escapeHtml(e.jam || '-') + ')</div>' +
+            '<div style="margin-top:2px;">👥 <b>Peserta:</b> <span style="font-weight:700;color:var(--primary);">' + count + '</span> siswa terdaftar</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:8px;padding-top:10px;border-top:1px dashed var(--gray-200);">' +
+          '<button class="btn btn-primary btn-sm" style="width:100%;" onclick="goTo(\'input-absensi\', \'' + e.id + '\')">' +
+            '📝 Isi Absen ' + escapeHtml(e.name) +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    html += '</div></div>';
+
+    // TABEL SESI LATIHAN TERAKHIR
+    html += '<div class="card">' +
+      '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<h3 class="card-title">🕒 Sesi Presensi Latihan Terbaru</h3>' +
+        '<button class="btn btn-outline btn-sm" onclick="goTo(\'riwayat\')">Lihat Semua Riwayat ➡️</button>' +
+      '</div>';
+
+    if (topSesi.length === 0) {
+      html += '<p class="text-muted text-center" style="padding:24px;">Belum ada sesi latihan yang diabsen.</p>';
+    } else {
+      html += '<div class="table-responsive"><table class="table">' +
+        '<thead><tr>' +
+          '<th>Tanggal</th>' +
+          '<th>Ekstrakurikuler</th>' +
+          '<th class="text-center">Sakit</th>' +
+          '<th class="text-center">Izin</th>' +
+          '<th class="text-center">Alpha</th>' +
+          '<th class="text-center">Total Absen</th>' +
+          '<th class="text-center">Aksi</th>' +
+        '</tr></thead>' +
+        '<tbody>';
+
+      topSesi.forEach(function(s) {
+        html += '<tr>' +
+          '<td><b>' + s.tanggal + '</b></td>' +
+          '<td><span class="badge badge-info">' + escapeHtml(s.ekskulName) + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--warning);font-weight:700;">' + s.sakit + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--info);font-weight:700;">' + s.izin + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--danger);font-weight:700;">' + s.alpha + '</span></td>' +
+          '<td class="text-center"><b>' + s.totalAbsen + ' siswa</b></td>' +
+          '<td class="text-center">' +
+            '<button class="btn btn-outline btn-sm" onclick="goTo(\'input-absensi\', \'' + s.ekskulId + '\')">Periksa / Edit</button>' +
+          '</td>' +
+        '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+    }
+
+    html += '</div>';
+
+    ca.innerHTML = html;
+  });
+}
+
+// ============================================================
+// DASHBOARD KHUSUS WALI KELAS
+// ============================================================
+function renderDashboardWalikelas() {
+  setHeader('Dashboard Wali Kelas', 'Pemantauan keaktifan & ketidakhadiran ekstrakurikuler peserta didik per kelas');
+  var ca = document.getElementById('contentArea');
+  ca.innerHTML = '<div class="text-center" style="padding:40px;">⏳ Memuat dashboard wali kelas...</div>';
+
+  callApi('getAllData', [], function(data) {
+    if (data && data.appConfig) saveLogoConfig(data.appConfig, true);
+
+    var allKelas = data.kelas || [];
+    var allSiswa = data.siswa || [];
+    var allReg = data.keikutsertaan || [];
+    var allAbs = data.absensi || [];
+    var allEkskul = data.ekskul || [];
+
+    var eMap = {};
+    allEkskul.forEach(function(e){ eMap[e.id] = e.name; });
+
+    var isWaliBound = (CU.role === 'walikelas' && CU.kelasId);
+    var myKelas = isWaliBound ? allKelas.find(function(k){ return k.id === CU.kelasId; }) : null;
+
+    var relevantSiswa = isWaliBound ? allSiswa.filter(function(s){ return s.kelasId === CU.kelasId; }) : allSiswa;
+    var relevantSids = relevantSiswa.map(function(s){ return s.id; });
+
+    // Siswa yang ikut ekskul
+    var enrolledSids = {};
+    allReg.forEach(function(r){
+      if (!isWaliBound || relevantSids.indexOf(r.siswaId) >= 0) {
+        enrolledSids[r.siswaId] = true;
+      }
+    });
+    var jmlIkutEkskul = Object.keys(enrolledSids).length;
+    var persenIkut = relevantSiswa.length > 0 ? Math.round((jmlIkutEkskul / relevantSiswa.length) * 100) : 0;
+
+    // Perhitungan ketidakhadiran per siswa
+    var studentAbsMap = {};
+    var totalAbsRelevant = 0;
+    allAbs.forEach(function(a){
+      if (isWaliBound && relevantSids.indexOf(a.siswaId) < 0) return;
+      totalAbsRelevant++;
+
+      if (!studentAbsMap[a.siswaId]) {
+        studentAbsMap[a.siswaId] = { total: 0, sakit: 0, izin: 0, alpha: 0, ekskulMap: {} };
+      }
+      studentAbsMap[a.siswaId].total++;
+      var st = (a.status || '').toLowerCase();
+      if (st === 'sakit') studentAbsMap[a.siswaId].sakit++;
+      else if (st === 'izin') studentAbsMap[a.siswaId].izin++;
+      else if (st === 'alpha') studentAbsMap[a.siswaId].alpha++;
+
+      var ename = eMap[a.ekskulId] || a.ekskulId;
+      studentAbsMap[a.siswaId].ekskulMap[ename] = (studentAbsMap[a.siswaId].ekskulMap[ename] || 0) + 1;
+    });
+
+    // Siswa dengan absensi tertinggi (peringatan wali kelas)
+    var perhatianList = [];
+    relevantSiswa.forEach(function(s){
+      var stat = studentAbsMap[s.id];
+      if (stat && stat.total > 0) {
+        var kObj = allKelas.find(function(k){ return k.id === s.kelasId; });
+        var ekskulRincian = [];
+        for (var en in stat.ekskulMap) {
+          ekskulRincian.push(en + ' (' + stat.ekskulMap[en] + 'x)');
+        }
+        perhatianList.push({
+          siswa: s,
+          kelasName: kObj ? kObj.name : s.kelasId,
+          total: stat.total,
+          sakit: stat.sakit,
+          izin: stat.izin,
+          alpha: stat.alpha,
+          rincian: ekskulRincian.join(', ')
+        });
+      }
+    });
+    perhatianList.sort(function(a, b){ return b.total - a.total; });
+    var topPerhatian = perhatianList.slice(0, 5);
+
+    // Hitung per kelas
+    var kMap = {};
+    var displayKelasList = isWaliBound && myKelas ? [myKelas] : allKelas;
+    displayKelasList.forEach(function(k){
+      var siswaDiKelas = allSiswa.filter(function(s){ return s.kelasId === k.id; });
+      var sidsInKelas = siswaDiKelas.map(function(s){ return s.id; });
+      var absDiKelas = allAbs.filter(function(a){ return sidsInKelas.indexOf(a.siswaId) >= 0; });
+      var ikutDiKelas = siswaDiKelas.filter(function(s){ return enrolledSids[s.id]; });
+
+      kMap[k.id] = {
+        kelas: k,
+        totalSiswa: siswaDiKelas.length,
+        ikutEkskul: ikutDiKelas.length,
+        totalAbsen: absDiKelas.length,
+        sakit: absDiKelas.filter(function(x){ return (x.status||'').toLowerCase() === 'sakit'; }).length,
+        izin: absDiKelas.filter(function(x){ return (x.status||'').toLowerCase() === 'izin'; }).length,
+        alpha: absDiKelas.filter(function(x){ return (x.status||'').toLowerCase() === 'alpha'; }).length
+      };
+    });
+
+    var bannerSubtitle = isWaliBound && myKelas ?
+      ('Akun Wali Kelas ' + escapeHtml(myKelas.name) + ' aktif. Pantau keikutsertaan dan ketidakhadiran peserta didik kelas binaan Anda untuk pembinaan, konseling, dan pengisian buku rapor.') :
+      'Pantau akumulasi ketidakhadiran peserta didik per kelas secara rinci untuk keperluan pembinaan, konseling, dan pelaporan buku rapor.';
+
+    var bannerBadge = isWaliBound && myKelas ?
+      ('👩‍🏫 PORTAL WALI KELAS: ' + escapeHtml(myKelas.name.toUpperCase())) :
+      '👩‍🏫 PORTAL RESMI WALI KELAS';
+
+    var html = '' +
+      // HERO BANNER WALI KELAS
+      '<div class="card" style="background:linear-gradient(135deg, #0f766e 0%, #0d9488 100%);color:#fff;border:none;margin-bottom:16px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+          '<div>' +
+            '<div style="display:inline-block;padding:2px 8px;background:rgba(255,255,255,0.2);border-radius:12px;font-size:11px;font-weight:600;margin-bottom:6px;">' + bannerBadge + '</div>' +
+            '<h2 style="font-size:20px;font-weight:800;margin:0 0 4px 0;color:#fff;">Selamat Datang, ' + escapeHtml(CU.name) + '! 📋</h2>' +
+            '<p style="font-size:12px;opacity:0.9;margin:0;max-width:540px;">' + bannerSubtitle + '</p>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button class="btn" style="background:#fff;color:#0f766e;font-weight:700;border:none;" onclick="goTo(\'laporan-kelas\'' + (isWaliBound ? ',\'' + CU.kelasId + '\'' : '') + ')">📈 Buka Rekap ' + (isWaliBound && myKelas ? escapeHtml(myKelas.name) : 'Kelas') + '</button>' +
+            '<button class="btn" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);" onclick="goTo(\'unduh\')">⬇️ Unduh CSV Excel</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // 4 STATS WALI KELAS
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:16px;">' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">' + (isWaliBound ? 'Kelas Binaan' : 'Total Rombel / Kelas') + '</div>' +
+            '<span style="font-size:18px;">🏫</span>' +
+          '</div>' +
+          '<div style="font-size:' + (isWaliBound ? '20px' : '26px') + ';font-weight:800;color:var(--primary);margin-top:4px;">' + (isWaliBound && myKelas ? escapeHtml(myKelas.name) : allKelas.length) + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (isWaliBound ? 'Rombel binaan Anda' : 'Kelas 7A - 9B') + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Peserta Didik</div>' +
+            '<span style="font-size:18px;">👨‍🎓</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--info);margin-top:4px;">' + relevantSiswa.length + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (isWaliBound ? 'Siswa di kelas ini' : 'Siswa binaan sekolah') + '</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Partisipasi Ekskul</div>' +
+            '<span style="font-size:18px;">✨</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--success);margin-top:4px;">' + persenIkut + '%</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + jmlIkutEkskul + ' dari ' + relevantSiswa.length + ' siswa terdaftar</div>' +
+        '</div>' +
+        '<div class="card" style="margin-bottom:0;padding:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<div style="font-size:11px;color:var(--gray-500);font-weight:600;">Ketidakhadiran Tercatat</div>' +
+            '<span style="font-size:18px;">⚠️</span>' +
+          '</div>' +
+          '<div style="font-size:26px;font-weight:800;color:var(--danger);margin-top:4px;">' + totalAbsRelevant + '</div>' +
+          '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (isWaliBound ? 'Total S/I/A siswa di kelas ini' : 'Total akumulasi S/I/A') + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // PERINGATAN SISWA DENGAN KETIDAKHADIRAN TERTINGGI (TOP ATTENTION)
+      '<div class="card">' +
+        '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<h3 class="card-title">⚠️ Siswa Perlu Perhatian (Ketidakhadiran Terbanyak)</h3>' +
+          '<button class="btn btn-outline btn-sm" onclick="goTo(\'laporan-kelas\'' + (isWaliBound ? ',\'' + CU.kelasId + '\'' : '') + ')">Lihat Rekap Kelas ➡️</button>' +
+        '</div>';
+
+    if (topPerhatian.length === 0) {
+      html += '<div style="padding:20px;text-align:center;color:var(--success);font-weight:600;">' +
+        '🎉 Tidak ada catatan ketidakhadiran siswa! Semua siswa aktif mengikuti kegiatan.' +
+      '</div>';
+    } else {
+      html += '<div class="table-responsive"><table class="table">' +
+        '<thead><tr>' +
+          '<th>Nama Siswa</th>' +
+          '<th>Kelas</th>' +
+          '<th class="text-center">Sakit</th>' +
+          '<th class="text-center">Izin</th>' +
+          '<th class="text-center">Alpha</th>' +
+          '<th class="text-center">Total Absen</th>' +
+          '<th>Rincian di Cabang Ekskul</th>' +
+        '</tr></thead><tbody>';
+
+      topPerhatian.forEach(function(item) {
+        html += '<tr>' +
+          '<td><b>' + escapeHtml(item.siswa.nama) + '</b> <span class="text-muted" style="font-size:11px;">(' + item.siswa.nis + ')</span></td>' +
+          '<td><span class="badge badge-gray">' + escapeHtml(item.kelasName) + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--warning);font-weight:700;">' + item.sakit + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--info);font-weight:700;">' + item.izin + '</span></td>' +
+          '<td class="text-center"><span style="color:var(--danger);font-weight:700;">' + item.alpha + '</span></td>' +
+          '<td class="text-center"><span class="badge ' + (item.total >= 3 ? 'badge-danger' : 'badge-warning') + '" style="font-size:12px;">' + item.total + 'x Absen</span></td>' +
+          '<td><span style="font-size:11px;color:var(--gray-700);">' + escapeHtml(item.rincian) + '</span></td>' +
+        '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+    }
+
+    html += '</div>';
+
+    // RINGKASAN REKAP PER KELAS
+    html += '<div class="card">' +
+      '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<h3 class="card-title">🏫 Ringkasan Ketidakhadiran per Kelas Binaan</h3>' +
+        '<span class="badge badge-info">' + allKelas.length + ' Kelas</span>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;">';
+
+    allKelas.forEach(function(k) {
+      var inf = kMap[k.id] || { totalSiswa: 0, ikutEkskul: 0, totalAbsen: 0, sakit: 0, izin: 0, alpha: 0 };
+      html += '<div style="border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;">' +
+        '<div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+            '<h4 style="font-size:16px;font-weight:800;margin:0;color:var(--primary);">' + escapeHtml(k.name) + '</h4>' +
+            '<span class="badge badge-gray">' + inf.totalSiswa + ' Siswa</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--gray-600);margin-bottom:8px;">' +
+            '<div>✨ <b>Ikut Ekskul:</b> ' + inf.ikutEkskul + ' siswa</div>' +
+            '<div style="margin-top:2px;">⚠️ <b>Ketidakhadiran:</b> ' +
+              '<span style="color:var(--warning);font-weight:700;">' + inf.sakit + ' S</span> • ' +
+              '<span style="color:var(--info);font-weight:700;">' + inf.izin + ' I</span> • ' +
+              '<span style="color:var(--danger);font-weight:700;">' + inf.alpha + ' A</span> ' +
+              '(Total ' + inf.totalAbsen + 'x)' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:8px;padding-top:10px;border-top:1px dashed var(--gray-200);">' +
+          '<button class="btn btn-outline btn-sm" style="width:100%;" onclick="goTo(\'laporan-kelas\', \'' + k.id + '\')">' +
+            '📊 Buka Rekap ' + escapeHtml(k.name) + ' ➡️' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    html += '</div></div>';
+
+    ca.innerHTML = html;
+  });
+}
+
+function renderLaporanAdmin() { renderLaporanKelas(); }
+
+// ============================================================
+// INISIALISASI
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  loadLocalDB();
+  renderAllLogos();
+  if (isGas()) {
+    callApi('getAppConfigServer', [], function(cfg){
+      if (cfg) saveLogoConfig(cfg, true);
+    });
+  }
+
+  // Cek Parameter Portal URL
+  var urlParams = new URLSearchParams(window.location.search);
+  var ssoPortalUrl = urlParams.get('portal_url');
+  if (ssoPortalUrl) {
+    sessionStorage.setItem('ekskul_portal_url', ssoPortalUrl);
+  }
+  var effectivePortalUrl = ssoPortalUrl || sessionStorage.getItem('ekskul_portal_url');
+  var btnPortal = document.getElementById('btnKembaliPortalEkskul');
+  if (btnPortal && effectivePortalUrl) {
+    btnPortal.href = effectivePortalUrl;
+    btnPortal.style.display = 'inline-flex';
+  }
+
+  var elU = document.getElementById('loginU');
+  var elP = document.getElementById('loginP');
+  if (elU) {
+    elU.focus();
+    elU.addEventListener('keydown', function(e){ if (e.key === 'Enter') doLogin(); });
+  }
+  if (elP) {
+    elP.addEventListener('keydown', function(e){ if (e.key === 'Enter') doLogin(); });
+  }
+});
+</script>
+</body>
+</html>
