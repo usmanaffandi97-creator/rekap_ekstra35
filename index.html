@@ -510,8 +510,9 @@
     </div>
   </div>
 
-<script>
-// ============================================================
+  <script src="config.js"></script>
+  <script>
+  // ============================================================
 // 🎨 TEMPAT MENGGANTI LOGO & IDENTITAS INSTANSI (BISA MENGGUNAKAN URL)
 // ============================================================
 // Anda dapat memasukkan URL gambar langsung (https://... / link Google Drive / base64 / .png / .jpg / .svg / .webp)
@@ -1074,10 +1075,34 @@ var DEFAULT_DB = {
   ]
 };
 
+// ============================================================
+// KONFIGURASI BACKEND & AUTO-ONLINE VERCEL
+// ============================================================
+var DEFAULT_GAS_API_URL = (typeof window !== 'undefined' && window.DEFAULT_GAS_API_URL) ?
+  window.DEFAULT_GAS_API_URL :
+  'https://script.google.com/macros/s/AKfycbzJ20QSK6n95AC2cmJEg7Bo6JBDsKiP9_5McZt7wKVUdmWefnG5t1HCX9I18SrXxNyV/exec';
+
 var GAS_API_KEY = 'rekapEkskul_v4_gasApiUrl';
 
 function getGasApiUrl() {
-  try { return localStorage.getItem(GAS_API_KEY) || ''; } catch(e) { return ''; }
+  // 1. Cek parameter URL (?api=https://... atau ?backend=https://...)
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var u = p.get('api') || p.get('backend');
+    if (u && u.indexOf('https://script.google.com/macros/s/') === 0) {
+      localStorage.setItem(GAS_API_KEY, u.trim());
+      return u.trim();
+    }
+  } catch(e) {}
+
+  // 2. Cek localStorage
+  try {
+    var stored = localStorage.getItem(GAS_API_KEY);
+    if (stored && stored.trim() !== '') return stored.trim();
+  } catch(e) {}
+
+  // 3. Gunakan DEFAULT_GAS_API_URL permanen (dari config.js atau variabel)
+  return (DEFAULT_GAS_API_URL || '').trim();
 }
 
 function setGasApiUrl(url) {
@@ -4046,9 +4071,25 @@ window.addEventListener('DOMContentLoaded', function() {
   loadLocalDB();
   renderAllLogos();
   updateEnvBadges();
-  if (isGas() || getGasApiUrl()) {
+
+  var activeUrl = getGasApiUrl();
+  if (isGas() || activeUrl) {
     callApi('getAppConfigServer', [], function(cfg){
       if (cfg) saveLogoConfig(cfg, true);
+    });
+    callApi('getAllData', [], function(data){
+      if (data) {
+        if (data.users && Array.isArray(data.users)) DB.users = data.users;
+        if (data.kelas && Array.isArray(data.kelas)) DB.kelas = data.kelas;
+        if (data.ekskul && Array.isArray(data.ekskul)) DB.ekskul = data.ekskul;
+        if (data.siswa && Array.isArray(data.siswa)) DB.siswa = data.siswa;
+        if (data.keikutsertaan && Array.isArray(data.keikutsertaan)) DB.keikutsertaan = data.keikutsertaan;
+        if (data.absensi && Array.isArray(data.absensi)) DB.absensi = data.absensi;
+        saveLocalDB();
+        updateEnvBadges();
+      }
+    }, function(err){
+      console.warn('Auto-sync server awal:', err);
     });
   }
 
